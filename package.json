@@ -1,0 +1,31 @@
+{
+  "name": "fireward",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "panda codegen",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check",
+    "format": "biome format --write",
+    "verify:analytics": "node scripts/verify-grootguard-cells.mjs"
+  },
+  "dependencies": {
+    "h3-js": "^4.5.0",
+    "mapbox-gl": "^3.31.0",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.2",
+    "@pandacss/dev": "^1.12.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@9.1.3"
+}

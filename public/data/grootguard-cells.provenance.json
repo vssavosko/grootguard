@@ -1,0 +1,25 @@
+{
+  "snapshot": "GrootGuard prepared Spain H3 cells",
+  "source_repository": "https://github.com/abdullahalsaidi16/grootguard",
+  "source_commit": "2e6ec317be0595ea90f53445ce424404c090ecdf",
+  "source_path": "data/prepared/cells.json",
+  "imported_at": "2026-09-19",
+  "sources": [
+    {
+      "name": "ESA WorldCover 2021",
+      "url": "https://worldcover2021.esa.int/",
+      "license": "CC BY 4.0"
+    },
+    {
+      "name": "Kontur Population",
+      "url": "https://data.humdata.org/dataset/kontur-population-dataset",
+      "license": "CC BY 4.0"
+    },
+    {
+      "name": "OpenStreetMap contributors",
+      "url": "https://www.openstreetmap.org/copyright",
+      "license": "ODbL 1.0"
+    }
+  ],
+  "excluded": ["weather", "moisture", "consequence", "combustion", "priority"]
+}

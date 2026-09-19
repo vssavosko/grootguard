@@ -1,0 +1,9 @@
+{
+  "snapshot": "geoBoundaries Spain ADM0 simplified",
+  "boundary_id": "ESP-ADM0-43220588",
+  "source": "Instituto Geografico Nacional via geoBoundaries",
+  "source_url": "https://www.geoboundaries.org/api/current/gbOpen/ESP/ADM0/",
+  "download_url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ESP/ADM0/geoBoundaries-ESP-ADM0_simplified.geojson",
+  "license": "CC BY 4.0",
+  "purpose": "Hide H3 cells whose centres are outside Spain; cell polygons and observations remain unchanged."
+}
