@@ -1,0 +1,403 @@
+<title>Fusion Build Spec</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#10161d; --panel:#171f28; --panel2:#1d2732; --line:#2b3a48;
+    --ink:#e8e4dc; --dim:#9aa5ad; --faint:#5f6b74;
+    --ember:#ff7a45; --ember-dim:#c2603c; --ok:#8fc98f; --warn:#e8c468; --syn:#c792ea;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    --sans:'Archivo',system-ui,-apple-system,sans-serif;
+  }
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;
+       padding-inline:clamp(16px,4vw,40px);padding-block:0 64px;}
+  .wrap{max-width:880px;margin:0 auto;}
+  header.hero{padding-block:40px 28px;border-bottom:2px solid var(--ember);}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);}
+  h1{font-size:clamp(34px,6vw,52px);font-weight:800;margin:.15em 0 .2em;line-height:1.05;text-wrap:balance;}
+  .sub{color:var(--dim);max-width:62ch;margin:0;}
+  h2{font-size:22px;font-weight:700;margin:0 0 4px;text-wrap:balance;}
+  h3{font-size:15px;font-weight:700;margin:18px 0 6px;color:var(--ink);}
+  section{margin-top:36px;}
+  .secnum{font-family:var(--mono);color:var(--ember);font-size:13px;letter-spacing:.1em;display:block;margin-bottom:2px;}
+  p{max-width:68ch;}
+  .lead{color:var(--dim);margin-top:0;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-top:14px;}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;}
+  .card h4{margin:0 0 6px;font-size:14px;font-weight:700;}
+  .card p{font-size:13.5px;color:var(--dim);margin:0;}
+  .k{font-family:var(--mono);font-size:12.5px;color:var(--ember);}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;}
+  .tblwrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px;}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+     text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--panel2);white-space:nowrap;}
+  td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink);}
+  tr:last-child td{border-bottom:none;}
+  td.mono, .mono{font-family:var(--mono);font-size:12.5px;}
+  a{color:var(--ember);text-decoration-color:var(--ember-dim);}
+  code,pre{font-family:var(--mono);font-size:12.5px;}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;}
+  pre{background:#0b1016;border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;
+      line-height:1.5;margin:12px 0 0;}
+  pre code{background:none;border:none;padding:0;}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;border-radius:3px;
+       padding:2px 7px;vertical-align:2px;margin-left:6px;white-space:nowrap;}
+  .tag.scan{background:#1d3324;color:var(--ok);border:1px solid #2e4d36;}
+  .tag.verify{background:#3a3120;color:var(--warn);border:1px solid #55461f;}
+  .tag.risk{background:#3d2320;color:#f08c7d;border:1px solid #5c332d;}
+  .tag.syn{background:#2e2440;color:var(--syn);border:1px solid #453763;}
+  ul{padding-left:20px;margin:8px 0;}
+  li{margin:5px 0;max-width:66ch;}
+  li::marker{color:var(--ember);}
+  .who{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--bg);background:var(--ember);
+       border-radius:3px;padding:2px 7px;margin-right:8px;white-space:nowrap;}
+  .who.b{background:var(--warn);} .who.c{background:var(--syn);}
+  .time td:first-child{font-family:var(--mono);white-space:nowrap;color:var(--ember);}
+  .rule{border:none;border-top:1px solid var(--line);margin:28px 0 0;}
+  .big{font-size:17px;max-width:64ch;}
+  .footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);
+          font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .num{font-variant-numeric:tabular-nums;}
+</style>
+<div class="wrap">
+
+<header class="hero">
+  <span class="eyebrow">HackBarna · AI Summit BCN · Wildfire Track · 19–20 Sep 2026</span>
+  <h1>FUSION</h1>
+  <p class="sub">The prevention terminal for wildfires. Every layer is public — fuel, weather, infrastructure, people. Nobody crossed them. We rank every cell of Spain by what its loss would cascade into, and turn a prevention budget into an optimal allocation.</p>
+</header>
+
+<section>
+  <span class="secnum">01</span>
+  <h2>The pitch in three lines</h2>
+  <div class="panel">
+    <p class="big" style="margin-top:0"><strong>Hook (rewritten 20 Sep — open on LIVE, the red dots first):</strong> <em>"These red dots are not a simulation. This is Spain burning right now — this minute, from the same Copernicus satellite feed the fire services watch. Around every dot our terminal already knows what's downwind: the fuel from ESA satellites, the people from census grids, the hospital behind the substation. And it knows what Spain can answer with: ten flyable water-bombers — ten, for seventeen regions, and the replacements land in 2028. The three largest fires in the 56-year record book all burned in the last fourteen months. FUSION is the screen that decides what we protect first — before the next dot appears."</em></p>
+    <p class="big"><strong>Use case (rewritten 20 Sep — a day at the desk, both clocks):</strong> the civil-protection duty officer opens FUSION at 08:00. <strong>LIVE</strong> is the workbench: real satellite hotspots on a map of 14,002 real cells, the last 10 observed days and the 10-day forecast on one hourly bar — and the terminal has already turned tomorrow's risk ranking into a staging plan: which sectors get the ten flyable amphibians, the ten BRIF heli-crews, the five UME battalions, at which alert level. Every ring is a recommendation with a number on it. Then the same screen takes the money: the prevention slider places grazing, burns, clearing and hardening where they buy the most future — and <strong>PREDICTION</strong> shows what that same euro does across three futures: <strong>46%</strong> of exposed people protected if the programme is sustained, <strong>6%</strong> if it's abandoned. One surface, both clocks — the fire this week and the fuel this decade — every choice signed, dated, auditable.</p>
+    <p class="big" style="margin-bottom:0"><strong>Climax:</strong> Drag the budget slider. €400M pours into goats, burns, machines and hardening — and the screen promises a band, not a number: <strong>13–23%</strong> of national risk removed, with the honest corner where prevention does <em>not</em> pay on display. <em>That corner is why a minister can trust the rest of the screen.</em></p>
+  </div>
+  <h3>Judge counters (memorize)</h3>
+  <ul>
+    <li><strong>"Doesn't EFFIS / the state already have this?" (THE grill question — rewritten 20 Sep after adversarial research)</strong> — "Yes: EGIF since 1968, AEMET's new 1-km IPIF index, mandated risk cartography — the state has excellent hazard data, and we say so. What it does NOT have — and the Pacto de Estado itself diagnoses this, proposing a 'National Plan for Interconnection and Interoperability' — is the fusion across silos and the auditable link from risk map → euro → executed measure → verified outcome. Galicia's own 2018 recommendations went unexecuted; 80% of high-risk municipalities lack their mandated plans (Greenpeace). The gap is execution and accountability, not information — and that is exactly the layer we sell."</li>
+    <li><strong>"Why a substation over a school?"</strong> — We don't price buildings, we trace failure: a substation's score <em>is</em> the hospitals and households that go dark when it burns. Criticality cascade, not price tags.</li>
+    <li><strong>"Prevention isn't real-time."</strong> — The queue re-ranks with this week's forecast. A dry-wind week moves a zone four ranks up. Real-time data → real-time decisions, exactly per brief.</li>
+    <li><strong>"Isn't fire natural here?"</strong> — A fire is a reset or a wipe. 2025's ledger: over 65% of NW Iberia burned at high severity — regime-breaking, not regenerative — and 44% of northern Spain's burns hit Natura 2000 habitats. Roughly one third reset, two thirds wipe. Our map shrugs at fire-adapted scrub and spends money only on the wipes. And the regime flip is dated and citable: early 1970s — fire frequency ×2, burned area ×10, fuel-limited → drought-driven (Pausas &amp; Fernández-Muñoz 2012).</li>
+  </ul>
+  <h3>Q&amp;A ammunition — 2025 season, verified 19 Sep 2026 <span class="tag scan">SCAN</span></h3>
+  <div class="tblwrap"><table>
+    <tr><th>Fact</th><th>Number</th><th>Source</th></tr>
+    <tr><td>Spain burned area 2025</td><td class="mono num">393,079 ha</td><td>EFFIS seasonal stats</td></tr>
+    <tr><td>Share of EU total (ES+PT)</td><td class="mono num">43% of &gt;1M ha — worst EU season on record</td><td>JRC / Science Media Centre ES</td></tr>
+    <tr><td>Concentration</td><td class="mono num">¼ of 66 large fires ⇒ &gt;75% of burned area</td><td>Science Media Centre ES</td></tr>
+    <tr><td>Ignition causes (long-run DB)</td><td class="mono num">4% lightning · 55% intentional · 16% negligence · 25% unknown</td><td>Spanish fire statistics via Red PAC</td></tr>
+    <tr><td>Human toll 2025</td><td class="mono num">4–8 dead (press counts conflict — <span class="tag verify">VERIFY before Q&amp;A</span>) · 50+ injured · ~36,000 evacuated</td><td>Ministry of Interior via Euronews/press</td></tr>
+    <tr><td>Record fires — all in last 14 months</td><td class="mono num">Top-3 of the entire EGIF record (1968+): Burgohondo (Ávila) ~50,000 ha Jul 2026 · Larouco (Ourense) 37,765 ha official (estimates to ~44,400) Aug 2025 · La Mierla (Guadalajara) ~32,000 ha Jul 2026</td><td>phys.org Jul 2026 / EGIF</td></tr>
+    <tr><td>What burned</td><td>mostly grass/shrub/transitional woodland, much on abandoned rural land</td><td>SMC ES (cover) · abandonment driver: literature <span class="tag verify">VERIFY cite</span></td></tr>
+    <tr><td>Reset vs wipe: severity</td><td class="mono num">&gt;65% of NW Iberia burned extent at high / mod-high severity</td><td>Fire Ecology 2026 (s42408-026-00465-9)</td></tr>
+    <tr><td>Ecological capital hit</td><td class="mono num">44% of N-Spain burns in Natura 2000 · 14 endangered + 51 vulnerable species' habitats</td><td>Fire Ecology 2026 (s42408-026-00512-5)</td></tr>
+    <tr><td>Plantations</td><td>highest fire severity of all cover types; burned plantations seldom recover</td><td>J. Applied Ecology 2025 (1365-2664.70176)</td></tr>
+    <tr><td>Climate context</td><td>2025-grade extreme fire weather now common in ES/PT</td><td>World Weather Attribution</td></tr>
+    <tr><td>Regime shift — dated</td><td class="mono num">early 1970s: fire frequency ×2, burned area ×10; fuel-limited → drought-driven (130-yr Valencia series)</td><td>Pausas &amp; Fernández-Muñoz 2012, Climatic Change</td></tr>
+    <tr><td>Prevention collapse</td><td class="mono num">€364M (2009) → €144M (2024); extinction held ~€417M; ~78/22 split of &gt;€1.8bn/yr</td><td>WWF España via The Conversation</td></tr>
+    <tr><td>Prevention leverage</td><td class="mono num">€1 prevention ≈ €100 suppression (industry estimate)</td><td>The Conversation</td></tr>
+    <tr><td>Fuel legacy</td><td class="mono num">&gt;3M ha flammable monoculture planted 1940–75, unmaintained → burned area 52k → 236k ha/yr (1970s → 1980s)</td><td>El Debate (hist.) / academic sources</td></tr>
+    <tr><td>Rx-burn scarcity</td><td class="mono num">1,051 prescribed burns in ALL of Spain, 1998–2021</td><td>GlobalRx / Nature Sci. Data 2025</td></tr>
+    <tr><td>2026 season to date</td><td class="mono num">~264,000 ha by 31 Aug 2026 — 2nd straight extreme year</td><td>The Local, 31 Aug 2026</td></tr>
+    <tr><td>The sheep math</td><td class="mono num">Full network by grazing = 6.7–23M sheep-eq vs 2.35M LSU national herd + 130–185k shepherds vs ~44k sector AWU — IMPOSSIBLE. Feasible slice: 0.5–1.5M ha, 5–15k shepherds, 15–35% of herd re-tasked. RAPCA all-in €137/ha vs mechanical €210–2,412/ha (−63–75%)</td><td>Forests 2018 (RAPCA study) / MAPA</td></tr>
+    <tr><td>Shepherd paradox</td><td class="mono num">pastoral burning ≈ 40% of known-cause fires — cheapest treatment agent IS a top ignition source; RAPCA converts the conflict into a paid, compliance-gated service (&lt;50% consumption = €0)</td><td>Forests 2018</td></tr>
+    <tr><td>Ideal biomass = a STATE, not a number</td><td class="mono num">engagement target 2,000–4,000 kW/m (10,000 = last-stand ceiling; Ávila 2025 ran 120–150,000); fine-fuel re-treat trigger 9–11 t/ha — untreated N-Spain averages 6.8 t/ha; mosaic: ~30% well-ARRANGED ≈ fireproof, random 20% ≈ nothing; percolation ~60% connectivity → ~40% in extreme weather; flow balance: forests add ~46 Mm³/yr, only ~40% extracted</td><td>Fernandes / Loehle / Finney / Castellnou</td></tr>
+    <tr><td>Demographics 2076</td><td class="mono num">INE: 49.6M → 53.8M (2041) → 53.0M (2076), migration-only, 65+ → 30.9%; Mediterranean WUI arc +16% while Extremadura −4.5% — demographics enter TWICE: exposure AND fuel (the sheep that left are why the fuel is there)</td><td>INE Proyecciones 2026–2076</td></tr>
+    <tr><td>Discounting, 60 yrs</td><td class="mono num">EU standard 3% real SDR; declining-rate schedules for long horizons; the SDR choice alone swings 2086 values ×7.7 (1.5% vs 5%). Costs: real terms, wage-indexed (Baumol). Anchors: burn ~€120/ha · graze €60–80 (Valencia pays €22/ha/yr) · clearing ~€1,000/ha</td><td>EC Vademecum / Green Book / Ann. For. Sci.</td></tr>
+    <tr><td>Insurance blind spot</td><td class="mono num">Consorcio (CCS) does NOT cover wildfire property damage — no unified national claims dataset exists; insured-loss data understates exposure</td><td>CCS coverage scope</td></tr>
+  </table></div>
+  <p class="lead" style="margin-top:10px">Full evidence base: <strong>fusion-research/</strong> corpus — 199 tagged findings, 180-event timeline 1900→present, 92-dataset registry, estimability matrix, misallocations ranking. Every number above traceable there.</p>
+</section>
+
+<section>
+  <span class="secnum">02</span>
+  <h2>Locked decisions</h2>
+  <div class="grid2">
+    <div class="card"><h4>Scope</h4><p>Prevention heatmap, Spain-wide, condition-aware (weekly re-rank). NOT live fire ops, NOT spread simulation.</p></div>
+    <div class="card"><h4>User</h4><p>Civil-protection planner allocating prevention money and clearing capacity.</p></div>
+    <div class="card"><h4>Value model</h4><p>Criticality cascade — score = downstream failure (services + population), declared first-order heuristic.</p></div>
+    <div class="card"><h4>Demo action</h4><p>Budget optimizer: slider allocates €, map lights up, counter shows protected value per euro.</p></div>
+    <div class="card"><h4>Stack</h4><p>Python pipeline → one scored GeoJSON in repo → React + MapLibre + deck.gl static site. No backend, nothing dies on stage.</p></div>
+    <div class="card"><h4>Goal</h4><p>Win the wildfire track. Judging: Impact · Implementation · Creativity ("well-scoped" is literal jury language).</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="secnum">03</span>
+  <h2>Data sources</h2>
+  <p class="lead">Provenance tags: <span class="tag scan">SCAN</span> verified today · <span class="tag verify">VERIFY</span> from memory — confirm before relying · <span class="tag risk">RISK</span> hardest pipeline item, has fallback.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Layer</th><th>Source</th><th>What we take</th></tr>
+    <tr><td><strong>Grid</strong></td><td class="mono">h3-py, res 6 (~36 km²/cell, ~14k cells for Spain)</td><td>Hex IDs from Spain boundary polygon (geoBoundaries ESP <span class="tag verify">VERIFY</span>). Kontur pop is H3 res 8 → aggregates natively.</td></tr>
+    <tr><td><strong>Population</strong></td><td><a href="https://data.humdata.org/dataset/kontur-population-spain">Kontur Population Spain</a> <span class="tag scan">SCAN</span></td><td>400 m H3 hexes, GeoPackage, no login. Sum res-8 counts into our res-6 cells.</td></tr>
+    <tr><td><strong>Assets</strong></td><td>OSM Overpass API <span class="tag scan">SCAN</span></td><td>Spain-wide: <code>amenity=hospital</code>, <code>power=substation</code>, <code>power=plant</code>, <code>amenity=school</code>, <code>landuse=industrial</code>, <code>railway=rail</code>. Queries in §05.</td></tr>
+    <tr><td><strong>Fuel</strong></td><td>ESA WorldCover 10 m, public AWS bucket <span class="tag verify">VERIFY</span> <span class="tag risk">RISK</span></td><td>Fraction of tree/shrub/grass cover per cell (rasterio sample). <strong>Fallback:</strong> CORINE WMS visual + OSM <code>natural=wood</code> coverage proxy.</td></tr>
+    <tr><td><strong>Fire danger (visual + condition)</strong></td><td><a href="https://ies-ows.jrc.ec.europa.eu/effis?request=getcapabilities&service=wms">EFFIS WMS</a> <span class="tag scan">SCAN</span></td><td>1–9 day fire-danger forecast (~36 km, 5 classes) as a map overlay — the "official weather of fire" layer.</td></tr>
+    <tr><td><strong>Weather (re-rank)</strong></td><td class="mono">api.open-meteo.com/v1/forecast <span class="tag scan">SCAN</span></td><td>Free, no key. Per top-50 zones only (rate-limit safety): t_max, RH_min, wind_max, precip last 7d.</td></tr>
+    <tr><td><strong>Ecological capital</strong></td><td>EEA Natura 2000 spatial dataset (public) <span class="tag verify">VERIFY download URL</span></td><td>Overlap fraction per cell → eco term in C. 44% of N-Spain's 2025 burns hit Natura 2000 sites — this is the second asset class.</td></tr>
+    <tr><td><strong>Historical burns</strong></td><td>EFFIS burnt-area product <span class="tag verify">VERIFY</span></td><td>Optional credibility layer: "our top zones overlap 2025's real fires." Only if time allows.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <span class="secnum">04</span>
+  <h2>Scoring model</h2>
+  <p class="lead">Every constant below is a <strong>declared assumption</strong> — they live in one <code>assumptions.json</code>, are shown on the methodology panel, and the cost figure is a UI slider. No number is presented as measured truth.</p>
+  <pre><code># per H3 cell i
+F_i = 1.0*tree_frac + 0.8*shrub_frac + 0.5*grass_frac          # fuel, 0..1
+W_i = clamp(0.6 + 0.25*z(t_max) + 0.25*z(-RH_min)
+          + 0.25*z(wind_max) + 0.25*z(days_since_rain), 0.6, 1.6)  # condition
+# WUI exposure filter: city cores don't burn in wildfires; bare/desertified land can't burn
+expF_i = clamp((F_i − 0.05)×1.6, 0.03, 1)     # exposed share of people & value per cell
+pop_exposed_i = pop_i × expF_i                # a Gran Vía flat is safe by definition;
+                                              # a village in the pines is ~fully exposed
+C_i = pop_exposed_i/8k + 0.5*Σ(pop_exposed_neighbors)/8k        # exposure
+    + Σ assets: hospital 10 · power_plant 9 · substation 8
+                + 0.002*pop_within_10km        # ← the cascade term
+                school 4 · industrial 3 · rail/motorway 2
+    + 6*natura2000_frac + 3*broadleaf_frac      # ← ecological capital
+      # fire-adapted scrub with no assets scores ~0 → the map itself
+      # answers "isn't fire natural?": a reset is cheap, a wipe is not
+M_i = fuel-moisture proxy 0..1 (ERA5 soil moisture / days-since-rain)   # the slow layer
+COMBUSTION_i = F_i × W_i × (0.4 + 0.6×(1−M_i))   # biomass × weather × dryness
+PRIORITY_i = COMBUSTION_i × C_i        # god's-eye fusion; only where F_i > 0.15
+# God's-Eye layer deck (map views): ECONOMICS=C · BIOMASS=F · WEATHER=W
+#   · MOISTURE=M · COMBUSTION=H · FUSION=PRIORITY (only FUSION shows allocation)
+# budget optimizer (the demo climax) — PORTFOLIO allocator, see table below
+STRAT = 0.25                          # treat the strategic fuel-break network, never every ha
+cost_i,instr = burnable_ha_i × STRAT × €/ha(instrument)
+allocate greedily by PRIORITY_i × eff / cost, respecting instrument CAPS
+outputs: risk removed as worst–best BAND · exposed people covered ·
+         workforce (shepherds / burn specialists / forest workers)</code></pre>
+  <p>The cascade term is the whole thesis in one line: a substation is worth the population it serves, not the steel it's made of. Say that sentence to the judges.</p>
+
+  <h3>Prevention portfolio — real instruments, best/worst cases (grilled 19 Sep)</h3>
+  <p>The optimizer is a <strong>portfolio allocator with capacity caps</strong>, not one lever. Effectiveness is a declared best/worst band; protected value renders as a range. Built in sim: first four. Documented-only: the rest.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Instrument</th><th>€/ha · cap</th><th>Best case (real)</th><th>Worst case (real)</th></tr>
+    <tr><td><strong>Grazing</strong> (built) — <em>maintenance-phase ONLY, chained after clearing/burn; cannot open dense scrub</em></td><td class="mono">€42–132 (all-in €137/ha) · hard-capped: herd math</td><td>RAPCA: 223 shepherds / ~14,000 ha (2025); 63–75% cheaper than mechanical; goats (the shrub-strippers) are the only growing census <span class="tag scan">SCAN</span></td><td>Full-network grazing needs 6.7–23M sheep-eq — Spain has 2.35M LSU. And the shepherd paradox: pastoral burning ≈ 40% of known-cause fires — unmonitored grazing programs IMPORT ignition risk</td></tr>
+    <tr><td><strong>Rx burn</strong> (built)</td><td class="mono">~250 · capped (weather windows)</td><td>Catalonia GRAF / Portugal prescribed-burn program</td><td>Escaped burns outside window; capacity overestimated — reality check: only 1,051 burns nationally 1998–2021, GRAF ~2,000 ha since 1999</td></tr>
+    <tr><td><strong>Mech. clearing</strong> (built)</td><td class="mono">~1,200 · no cap</td><td>Strategic corridors, maintained</td><td>One-off subsidies, regrowth in 3–5 yrs — money evaporates; machinery sparks in July are a real ignition cause</td></tr>
+    <tr><td><strong>WUI hardening</strong> (built)</td><td class="mono">high · no cap</td><td>Portugal Aldeia Segura: buffers, refuges, drills <span class="tag scan">SCAN</span></td><td>PG&amp;E deferred powerline maintenance → Camp Fire, 85 dead, ~$30B</td></tr>
+    <tr><td>Detection + rapid attack</td><td colspan="2">Highest ROI/€ in most budgets (kill at 1 ha)</td><td>The fire paradox: suppression-only spending manufactures megafires</td></tr>
+    <tr><td>Education / ignition mgmt</td><td colspan="2">Portugal post-2017: burn registration + alternatives → ignitions down <span class="tag scan">SCAN</span></td><td>Decades of Spanish poster campaigns; intentional share still ~55%</td></tr>
+    <tr><td>Productive mosaics</td><td colspan="2">Vineyards/olives as living firebreaks (Pedrógão lesson)</td><td>Paying for landscapes nobody farms after the subsidy</td></tr>
+    <tr><td>Species conversion</td><td colspan="2">Portugal's post-2017 eucalyptus-plantation restrictions</td><td>Plantations burn at highest severity, seldom recover</td></tr>
+    <tr><td>Land mobilization</td><td colspan="2">Galicia Banco de Terras — abandoned parcels back in management</td><td>Abandonment untouched = the fuel factory keeps running</td></tr>
+    <tr><td>Arson deterrence</td><td colspan="2">Investigation units (SEPRONA/BIIF); 55% intentional → conviction odds are prevention</td><td>Campaigns without enforcement</td></tr>
+    <tr><td>Financial instruments</td><td colspan="2">Insurance discounts for managed land, PES schemes</td><td>Subsidy-dependent biomass plants stall when subsidy dies</td></tr>
+  </table></div>
+  <p><strong>Timing rule (when):</strong> fuel work Oct–May, grazing pressure spring→June (RAPCA's real calendar), education before spring burns and June, detection live by June. Worst real-world pattern: emergency millions after August's fires, crumbs for prevention in spring. <strong>Placement rule (where):</strong> concentrate on high fuel × consequence corridors; the worst case is "café para todos" political spreading.</p>
+
+  <h3>The honest ratio — flow vs flow, never billions-vs-millions (grilled 19 Sep, late)</h3>
+  <p>Three numbers, three time bases — the product shows all three, labeled, and never blurs them:</p>
+  <ul>
+    <li><strong>Exposure secured (stock, €B)</strong> — assets standing in treated zones. Insurance language. NOT annual savings.</li>
+    <li><strong>Expected annual loss avoided (flow, €M/yr)</strong> — the only number comparable to the budget: real burn rate (EGIF 1968–2023 avg ≈ <span class="mono">146,000 ha/yr</span> <span class="tag scan">SCAN</span>) × declared €3k–15k/ha damage proxy = €0.4–2.2B/yr expected damage × the share of risk the allocation removes. Spend annualized by cycle (graze 1y · burn 3y · clear 4y · WUI 10y).</li>
+    <li><strong>CORRECTED 20 Sep, demo morning <span class="tag scan">measured from the running model</span> — the ratio is ≈ 0.4–3.1:1, NOT 2–8:1.</strong> The earlier 2–8:1 was a spec-time estimate that the built model does not reproduce; the sim was additionally flooring its own worst case to "1:1" via <code>Math.max(1,…)</code>, i.e. displaying a better number than it computed. Both are fixed. Measured at the default €400M: annualized spend €164M, avoided €58–504M/yr ⇒ <strong>0.4–3.1:1</strong> (€100M budget: 0.4–3.6:1). The band is <em>corner-to-corner</em>: the low end pairs worst-case effectiveness with the cheapest damage assumption (€3k/ha of burnt scrub) — at that corner prevention does <strong>not</strong> repay inside one year; the high end pairs best-case effectiveness with €15k/ha. Both corners understate: post-fire erosion and flood losses are not counted at all.</li>
+    <li><strong>The 1:100 quote</strong> stays a quote (marginal anecdote), never our claim. Pitch line: <em>"Between 0.4 and 3 times per year depending on which corner of the assumptions you stand in — and we show you the corner where it doesn't pay, because a number that only ever flatters us is worth nothing to you. Every assumption is a slider."</em> <strong>Why this is a stronger pitch:</strong> every other team will quote the €1→€100 folklore; we are the only ones whose screen argues against itself. That is the whole RISK TAKEN thesis in one number.</li>
+    <li><strong>Finance discipline (19 Sep, late night):</strong> all euros in <strong>constant-2026 real terms</strong>, labor-heavy costs escalated with real wages (Baumol), never flat nominal over decades. Three money numbers kept apart: <strong>year-1 cash</strong> (appropriation now) · <strong>steady-state €/yr</strong> (cycles settled: graze 1y / burn 3y / clear 4y) · <strong>CAPEX</strong> (WUI hardening = 10-yr infrastructure asset — amortized/bond-able, not an annual expense). Pathway budget paths, anchored: WORST replays the real 2009–24 decay (−2%/yr real; €364M→€144M) · AVG flat-real · BEST sustained wage-indexed. NPV over the 60-yr horizon uses the EU 3% real SDR with a declining-rate sensitivity (the SDR choice alone swings 2086 values ×7.7).</li>
+  </ul>
+
+  <h3>Who pays — the buyer ladder (user ≠ customer)</h3>
+  <ul>
+    <li><strong>Year 1 · Utilities</strong> (Red Eléctrica, Iberdrola, Naturgy): vegetation management is an existing budget line, PG&amp;E/$30B is the board memo, zero procurement politics. First paying customer.</li>
+    <li><strong>Year 2 · Insurers/reinsurers:</strong> wildfire repricing post-2025; exposure-secured stock + hourly risk state = an underwriting data feed (the actual Bloomberg business model).</li>
+    <li><strong>Year 3 · The state:</strong> the Aug-2025 Pacto de Estado (80 measures) needs an allocation-and-audit layer; the <strong>RISK TAKEN ledger</strong> converts silent omission into recorded decisions — what a minister needs after the next bad season. Pilot ONE region; never pitch "sell to Spain."</li>
+    <li>Forest owners / pulp / municipalities: interest yes, wallets thin — mention, don't build for.</li>
+  </ul>
+  <p><strong>The Monday-morning test:</strong> the planner opens FUSION, signs a season plan whose accepted risks are named, dispatches crews per the capacity calendar, and after the season shows the auditor the delta. That workflow exists nowhere today — that is the product.</p>
+</section>
+
+<section>
+  <span class="secnum">05</span>
+  <h2>Pipeline &amp; repo</h2>
+  <pre><code>fusion/
+├── pipeline/            # python, run once locally, outputs committed
+│   ├── 01_grid.py       # Spain boundary → res-6 hex list
+│   ├── 02_population.py # Kontur gpkg → pop per hex
+│   ├── 03_assets.py     # Overpass pulls → assets per hex (+cascade calc)
+│   ├── 03b_natura.py    # EEA Natura 2000 → overlap fraction per hex
+│   ├── 04_fuel.py       # WorldCover → veg fractions per hex   [RISK item]
+│   ├── 05_weather.py    # Open-Meteo for top-50 → W multipliers
+│   ├── 06_score.py      # join → web/public/cells.geojson
+│   └── assumptions.json # every weight & constant, single source
+├── web/                 # Vite + React + MapLibre + deck.gl (H3HexagonLayer)
+├── DEFENCE.md           # Norma side-quest (§08)
+└── README.md            # methodology + honesty ledger</code></pre>
+  <h3>Overpass query pattern (assets)</h3>
+  <pre><code>[out:json][timeout:180];
+area["ISO3166-1"="ES"][admin_level=2]->.es;
+( node["amenity"="hospital"](area.es);
+  way["amenity"="hospital"](area.es); );
+out center;   # repeat per asset class — 6 small queries beat 1 giant one</code></pre>
+  <h3>Final UX — three views (locked 19 Sep, evening; time bases finalized 19 Sep night)</h3>
+  <p>Top-level navigation: <strong>HISTORIC · LIVE · PREDICTION</strong>. One decision surface (LIVE), one proof surface (HISTORIC), one consequence surface (PREDICTION). <strong>Three time bases:</strong> HISTORIC = 1900 → now (weekly) · LIVE = <strong>D-10 … D+10 dynamic range</strong> (last 10 days observed + next 10 days forecast — the honest window of weather knowledge; hourly diurnal cycle inside it) · PREDICTION = <strong>2026 → 2086 horizon slider</strong>, single-horizon view: only the latest prediction for the selected year is ever shown, past runs never stack. <strong>Evidence continuity:</strong> documented fire scars carry across all three views under one rule (85% faded at 15 years; risk prior = fade × ~5-yr regrowth) — in PREDICTION they keep fading as the horizon advances until the map honestly declares "evidence gone, model alone"; no future fires are ever invented. Prediction pathways differ in ONE lever: whether the prevention program is sustained (fuel path), against a declared warming trend.</p>
+  <ul>
+    <li><strong>1 · HISTORIC — the proof.</strong> Century replay, <strong>1900 → mid-2026</strong>, weekly: early decades run dim (fuel-limited grazed landscape — declared model per fusion-research anchors), the map fills with fuel after 1950 (exodus + 3M ha plantations), the regime flips ~1972 (Pausas 2012), and the record era ends on Burgohondo 2026 — the largest fire in the Spanish record. Documented real fires appear as scars in their real week (record starts 1961/1968 — earlier decades honestly show none). An <strong>era-honesty chip</strong> from the estimability matrix labels every week: RECONSTRUCTION → MODELED → RECORDED → OBSERVED → MEASURED → DUAL-VERIFIED. Running counter: damage absorbed — real hectares, € as declared €3k–15k/ha proxy band. The beat: <em>"the model glows where reality burned — and the honesty label tells you how we know."</em></li>
+    <li><strong>2 · LIVE (NOW) — the workbench, two arms (doctrine locked 19 Sep, deep night).</strong> Today's fused map (EFFIS forecast + live Open-Meteo). <strong>Arm 1 — NOW-TOOLS, response readiness:</strong> the day's risk ranking becomes a staging plan — amphibious water-bombers (✈), BRIF heli-crews (H) and UME battalions (U) pre-positioned on the map with alert rings (DEPLOY pulsing red · HIGH ALERT amber · WATCH dashed), a work-order panel per day, fleet reserve counters, and on forecast days the imperative "pre-position now — arrival beats the fire." Fleet constraints are Spain's REAL, verified ones (see the two-arms table below). <strong>Arm 2 — prevention</strong> (grazing / rx burn / clearing / WUI), each chip tagged with its horizon (short–mid / mid / mid–long / long): started today, it pays on the PREDICTION horizon — it cannot stop this week's fire, and the UI says so. God's-Eye layer deck, top-20 rank table with ΔRank, cascade sentences, "at risk now" readout, portfolio budget bar with capped instruments, workforce line, worst–best band, returns curve. All decisions carry into PREDICTION.</li>
+    <li><strong>3 · PREDICTION — the consequence.</strong> Three <strong>scorecards</strong> (no maps — the allocation map lives in LIVE) for the coming season under the <em>same budget decision</em>:
+      <strong>WORST</strong> (2022/2025-grade season × worst-band effectiveness, red header) · <strong>AVERAGE</strong> (climatological × mid band, amber) · <strong>BEST</strong> (2018-grade × best band, green).
+      Each card spells out four numbers, no abstractions:
+      <ul>
+        <li><strong>people exposed</strong> (ink) · <strong>people saved</strong> (GREEN)</li>
+        <li><strong>value exposed €</strong> (ink) · <strong>value secured €</strong> (GREEN)</li>
+      </ul>
+      Counting only WUI-exposed people/value, with one fixed threshold across seasons so the identity holds: <em>exposed + saved = what that season threatens at zero budget</em> — the delta IS the decision. Caption: <em>"You don't choose the season — you choose how much of it you've already answered."</em></li>
+    <li><strong>Methodology panel</strong> (all views) — assumptions.json rendered honestly. Judges love this; it's also our rule.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="secnum">06</span>
+  <h2>Team split &amp; timeline</h2>
+  <p class="lead"><span class="who">A · DATA</span>pipeline &amp; sources · <span class="who b">B · MAP</span>frontend terminal · <span class="who c">C · MODEL</span>scoring, optimizer, pitch, side-quests</p>
+  <div class="tblwrap"><table class="time">
+    <tr><th>When (CEST)</th><th>Milestone</th></tr>
+    <tr><td>Sat 14:30</td><td>Repo up on GitHub · Vite scaffold renders empty dark map · Kontur + boundary downloads running.</td></tr>
+    <tr><td>Sat 17:00</td><td><span class="who">A</span>pop per hex done, assets pulling · <span class="who b">B</span>hex layer renders with placeholder gradient <span class="tag syn">SYN — never demo this state</span> · <span class="who c">C</span>assumptions.json + scoring stub.</td></tr>
+    <tr><td>Sat 19:00</td><td><strong>Gate 1:</strong> real cells.geojson v1 on the map. If fuel (04) is stuck → invoke fallback NOW, not at midnight.</td></tr>
+    <tr><td>Sat 22:00</td><td>Rank table + zone detail live · weather multipliers in · EFFIS overlay toggles.</td></tr>
+    <tr><td>Sun 09:00</td><td><strong>Gate 2:</strong> portfolio budget bar animates in LIVE + PREDICTION scorecards render (sharing the LIVE allocation state). Feature freeze — polish only.</td></tr>
+    <tr><td>Sun 10:30</td><td>Norma scan + fix 1 finding + DEFENCE.md committed · @hackbarna social post · methodology panel final.</td></tr>
+    <tr><td>Sun 11:30</td><td>Pitch rehearsed ×3 with timer. <span class="tag verify">VERIFY submission deadline &amp; format on Discord — unknown right now</span></td></tr>
+  </table></div>
+</section>
+
+<section>
+  <span class="secnum">07</span>
+  <h2>Honesty ledger (house rule, and a weapon)</h2>
+  <ul>
+    <li>€ and priority figures are <strong>declared proxies</strong> — methodology panel says so on screen.</li>
+    <li>Anything simulated carries a visible <span class="tag syn">SYN</span> badge. No demo halos.</li>
+    <li>Cells without data render as no-data, never as fake green.</li>
+    <li>Sentence for the pitch: <em>"Every number on this screen is either a public measurement or a labeled assumption you can change with a slider."</em> That line wins trust the other teams can't buy.</li>
+    <li><strong>Provenance grading in the UI (19 Sep, night):</strong> green edge = fully real &amp; sourced (ROOTSOURCE-covered) · amber = real totals, SYN split · purple = declared model. The sim is a REAL-PATTERN UX SIM: timelapse behavior follows the real record; only per-cell values await the pipeline.</li>
+  </ul>
+  <h3>Known tensions — declared, never discovered (final grill)</h3>
+  <ul>
+    <li><strong>Ignition unmodeled</strong> (95% human-lit, spatially structured) → EGIF's 640k dated events = training set, pipeline step 7.</li>
+    <li><strong>No connectivity/spread term</strong> — fuel continuity is the mechanism; mosaic-percolation targets to add.</li>
+    <li><strong>Static demographics &amp; nominal euros over 60 yrs</strong> → INE projections + social-discount slider planned.</li>
+    <li><strong>Secondary damages (post-fire erosion/floods) uncounted</strong> → the 0.4–3.1:1 ratio is likely understated. Say so.</li>
+    <li><strong>Adoption &gt; analytics:</strong> Spain's constraint is institutional; the RISK TAKEN ledger is the answer — one self-aware sentence to the jury.</li>
+    <li><strong>Calibrated on a vanished climate</strong> — the worst–best band carries the non-stationarity; name it first.</li>
+    <li><strong>Zone-€ cards are proxies:</strong> if challenged, defend the METHOD (declared, slider-changeable), never the appraisal.</li>
+  </ul>
+  <h3>The lawmaker hook — for budget holders, spend where it counts (19 Sep, deep night)</h3>
+  <p class="big"><strong>THE hook:</strong> <em>"After the next Burgohondo there will be an inquiry. This screen is what you will wish you could show it: every euro placed where it counted, every risk knowingly taken, signed and dated — before the fire."</em> For legislators, accountability and loss-aversion beat ROI — the RISK TAKEN ledger is the product; lead with it.</p>
+  <ul>
+    <li><strong>Fiscal asymmetry (the numbers they own):</strong> "You already spend €1.8bn a year on fire — 78% of it after ignition. The 2026 firefighting bill alone: up to €3.3bn. Prevention fell €364M → €144M while every record burned. Nobody decided that; it happened. This terminal makes the opposite a decision."</li>
+    <li><strong>The honest return:</strong> "€1 of planned prevention returns between €0.4 and €3 every year, flow against flow — more in the years that make headlines. At the pessimistic corner it does not repay inside twelve months, and this screen says so out loud. Every assumption is a slider you can interrogate." <em>(For a budget holder, the corner where it fails is the sentence that makes the other numbers credible — lead with it, don't bury it.)</em></li>
+    <li><strong>España vaciada dividend:</strong> "The prevention budget is the first rural-jobs program that pays for itself: ~2,000 winter jobs — shepherds, burn crews, forest workers — in exactly the emptying districts, doing the work whose absence causes the fires." (Depopulation is a fuel input; the jobs close the loop.)</li>
+    <li><strong>Constituency visibility:</strong> the map speaks in provinces and municipalities — a deputy can find their district, see what €X protects there, and what stays red with their name on the abstention.</li>
+    <li><strong>The instrument gap:</strong> "The Pacto de Estado has 80 measures and no allocation instrument. This is the instrument — and the audit trail it will need."</li>
+    <li><strong>Design consequence for that room:</strong> open on PREDICTION (the consequence view), not LIVE; pin a constituency; show DONE / RISK TAKEN / remaining under the three futures; close on the finance chip (year-1 cash · steady-state · CAPEX as bond-able infrastructure). The century replay is the mood-setter, the ledger is the ask.</li>
+  </ul>
+  <h3>The two arms — response readiness vs prevention (fleet VERIFIED 19 Sep 2026) <span class="tag scan">SCAN</span></h3>
+  <p><strong>Doctrine:</strong> LIVE owns the now-tools (crews, aircraft, alert levels — hours to days); the budget slider owns prevention (short/mid/long-term — months to decades). The UI enforces the separation so nobody mistakes goats for water-bombers. The verified response fleet, staged by the model:</p>
+  <div class="tblwrap"><table>
+    <tr><th>asset</th><th>verified value (2025/26)</th><th>source</th></tr>
+    <tr><td>✈ 43 Grupo amphibians (Ejército del Aire)</td><td><strong>17 Canadair on inventory</strong> (14 CL-215T + 3 CL-415) — but only <strong>~10 flyable</strong> in the 2025/26 campaigns (fleet age; 10 CL-215T in modernization)</td><td><a href="https://ejercitodelaireydelespacio.defensa.gob.es/EA/ejercitodelaire/es/Aeronaves/Aeronave/fa1895b7-9f27-11ee-b1b1-005056bf91c5/">Ejército del Aire (official)</a> · <a href="https://www.infodefensa.com/texto-diario/mostrar/2949465/ejercito-aire-trabaja-modernizacion-diez-apagafuegos-cl-215t">Infodefensa</a></td></tr>
+    <tr><td>Replacements</td><td>7 DHC-515 ordered Apr 2024 (~€375M), deliveries <strong>2028–2031</strong> (press 2026: may slip to 2029–32)</td><td><a href="https://www.defensa.gob.es/Galerias/gabinete/red/2025/01/p-42-43-red-423-apagafuegos.pdf">Revista Española de Defensa</a></td></tr>
+    <tr><td>H BRIF elite brigades (MITECO)</td><td><strong>10 bases</strong>, &gt;600 personnel (9× BRIF-A ~60 crew + 2 helos · 1× BRIF-B)</td><td><a href="https://www.miteco.gob.es/en/biodiversidad/temas/incendios-forestales/extincion/brif.html">MITECO (official)</a></td></tr>
+    <tr><td>U UME (military emergencies)</td><td><strong>5 battalions</strong> (BIEM, Torrejón · Morón · Bétera · Zaragoza · León), 3,500 personnel</td><td><a href="https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/defensa/paginas/2025/que-es-la-ume-unidad-militar-de-emergencia.aspx">La Moncloa / Defensa</a></td></tr>
+    <tr><td>State summer aerial campaign</td><td><strong>56 aircraft</strong> (confirmed 2025 and 2026)</td><td><a href="https://www.infobae.com/espana/agencias/2025/08/15/el-gobierno-dice-que-hay-56-aeronaves-para-la-campana-contra-incendios-y-acusa-al-pp-de-dar-informacion-falsa/">Gov. figure via EP</a></td></tr>
+    <tr><td>Regional forest firefighters</td><td>&gt;15,000 brigadistas; sector claims &gt;25,000 — <strong>no official census (declared K.A.)</strong></td><td><a href="https://www.cope.es/actualidad/vivir/biodiversidad/noticias/los-bomberos-forestales-exigen-miteco-estatuto-que-corrija-precariedad-20220708_2187735">EFE 2022</a></td></tr>
+    <tr><td>Canadair operating cost</td><td>€6,855–15,929 per flight-hour</td><td><a href="https://www.senat.fr/rap/r22-838/r22-8382.html">French Sénat r22-838</a></td></tr>
+  </table></div>
+  <p><strong>New pitch ammunition from the verification:</strong> <em>"Spain's water-bomber fleet is 17 planes on paper and about ten in the air; the seven replacements cost €375M and land in 2028 at the earliest. Between now and 2028, prevention is the only lever that can grow — and this terminal is how you place it."</em> The readiness gap IS the allocation argument.</p>
+  <h3>Demo discipline (the feature-soup guard)</h3>
+  <p>Fifteen demonstrable features, three minutes: show FOUR. HISTORIC replay running behind the hook (20s) → LIVE: one cascade story + the budget pour (70s) → PREDICTION: tri-compare ONE zone (40s) → close. DRILL, clock, layer deck, ROOTSOURCE = Q&amp;A answers only. Hook fallback if fact-checked live: <em>"the three largest fires in the 56-year record all happened in the last 14 months."</em></p>
+</section>
+
+<section>
+  <span class="secnum">08</span>
+  <h2>Side-quests (cheap prizes)</h2>
+  <ul>
+    <li><strong>Quality Clouds / Norma track</strong> (Keychron V6): <code>claude mcp add --scope user --transport http norma https://api.qualityclouds.ai/mcp</code> · scan repo · fix ≥1 finding · commit 3-line <code>DEFENCE.md</code> (Fixed / Left / Why). Owner: <span class="who c">C</span>, Sunday 10:30.</li>
+    <li><strong>Social prize</strong>: post the budget-slider clip, mention @hackbarna. 1 winner/day — post Saturday evening too.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="secnum">09</span>
+  <h2>3-minute demo script</h2>
+  <div class="tblwrap"><table class="time">
+    <tr><td>0:00</td><td><strong>Open ON LIVE (fork 2) — hotspots already on screen, ACTIVE 🔥 LIVE·EFFIS visible.</strong> "These red dots are not a simulation. This is Spain burning right now — this minute, from the same Copernicus satellite feed the fire services watch. Around every dot this terminal already knows what's downwind: fuel from ESA satellites, people from census grids, the hospital behind the substation. The three largest fires in the 56-year record all burned in the last fourteen months. The only question a planner has is: <em>what do I protect first?</em>" <em>(If the venue Wi-Fi kills the feed, the legend honestly says SIM — one sentence: "offline here, so the layer shows the pattern; on any connection these are the live satellite detections.")</em></td></tr>
+    <tr><td>0:30</td><td><strong>LIVE arm 1 — the week.</strong> Scrub to a forecast day, alert rings escalate: "The forecast is on an hourly bar — ten days observed, ten predicted, with the model's noise declared per day. FUSION turns tomorrow's ranking into a staging plan: ten flyable water-bombers — ten, for seventeen regions; verified, the replacements land in 2028 — plus BRIF crews and UME battalions, pre-positioned days ahead." Hover the #1 ring, cascade sentence: "#1 not because of trees — this substation feeds two hospitals and 40,000 homes." Pinch-zoom into Galicia: real village names, real assets.</td></tr>
+    <tr><td>1:10</td><td><strong>LIVE arm 2 — the decade. Budget pour.</strong> "The planes are the last line. This slider is the first: €400M — goats first, burns second, machines where nothing else reaches. Grazing CAPS — you can't buy more shepherds. We promise a band, not a number: <strong>13–23%</strong> of national risk removed." <span class="tag scan">measured 20 Sep</span> <em>(€100M → 8–14%. Never say 22–38%.)</em></td></tr>
+    <tr><td>1:45</td><td><strong>HISTORIC (fork 1) — the proof, 25 seconds.</strong> Press ▶. "How do we know the model is right? We replayed the century. Watch the year-block: population triples, the economy grows twenty-fold, the forest doubles while its consumers vanish — and around 1972 the regime flips. The scars land where the model glows; the fit is on screen. And every week carries its honesty label, from RECONSTRUCTION to DUAL-VERIFIED."</td></tr>
+    <tr><td>2:10</td><td><strong>PREDICTION (fork 3) — the consequence.</strong> <span class="tag scan">measured at horizon 2035</span> "Same budget, three futures. Sustained programme: <strong>46%</strong> of exposed people protected — 6.1 million. Abandoned — the path Spain is actually on, prevention fell €364M to €144M: the same euro protects <strong>6%</strong>. That gap isn't climate, it's whether anyone kept spending. And every red cell left is a risk we <em>chose</em>, on the record." <em>(Never say "drops by a third" — the panel shows 6%.)</em></td></tr>
+    <tr><td>2:45</td><td><strong>Close.</strong> "Every number on this screen is a public measurement or a labeled assumption — including the corner where prevention doesn't pay. That corner is why you can trust the rest. Next: live dispatch integration, cadastral value, EU-wide. Prevention is the cheapest fire you'll never fight. We're FUSION."</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <span class="secnum">10</span>
+  <h2>YouTube pitch video — shot list &amp; voiceover (the submission format)</h2>
+  <p class="lead">The pitch is submitted as a 3-minute video on YouTube. Locked arc (20 Sep, fourth pass): <strong>30 s licensed-stock news drama → 30 s the three paying customers (stake + ROI each) → the terminal (live · slider · three futures · century proof) → close.</strong> All numbers fact-check-approved (verification runs 20 Sep, §12); never speak the two rejected framings ("not allowed to cut", "intended by policy"). Cut lines that remain gold for Q&amp;A: the Galicia 50 m/31-May duty, Seaga 271/313, France +20% forecast — all in §12. Everything on screen is a screen-capture of Sim v44 — no stock footage, no fake fire imagery, ever. ~430 words ≈ 2:55 spoken — tone: human, blunt, no jargon; every number unchanged.</p>
+  <div class="tblwrap"><table class="time">
+    <tr><th>Time</th><th>Screen</th><th>Voiceover + overlays</th></tr>
+    <tr><td>0:00</td><td><strong>LICENSED STOCK (Shutterstock), 30 s:</strong> night flames · water-bomber drop · evacuation · news-studio glow. Fast cuts, rising music. Never caption a clip as a specific named fire; licence noted in the YT description</td><td>"Every August, Spain burns on live television. Helicopters. Water bombers. Ministers promising more planes. Last year: four hundred thousand hectares. Five billion euros of damage — less than one billion insured, because the state's catastrophe fund excludes forest fire. The bill lands on private shoulders. And the fuel that feeds it all took a century to build — and is still nobody's job to remove. Somebody always pays. The only question is: <strong>before the fire, or after it.</strong>" <em>Overlays: 400,000 ha · €5bn / &lt;€1bn insured · BEFORE — OR AFTER?</em></td></tr>
+    <tr><td>0:30</td><td><strong>Cut to FUSION LIVE</strong> — three customer cards overlay in sequence (state · civil-infrastructure pylon glyph · insurer)</td><td>"Three customers pay for <em>before</em>. <strong>The state:</strong> one-point-eight billion a year on fire, seventy-eight percent of it after ignition. Through FUSION, four hundred million removes thirteen to twenty-three percent of national risk. Measured. Signed. Dated. <strong>Civil infrastructure:</strong> grid, rail, water — one power-line fire cost a California utility thirty billion dollars, and the company itself. They already spend millions cutting vegetation; FUSION re-ranks every one of those euros by consequence — pylon by pylon — and hands them the defence file that stands up in court. <strong>Private insurance:</strong> four billion euros uninsured last year — and no wildfire model exists for Spain. FUSION is that missing feed: price street by street, or retreat blind." <em>Overlays: STATE → 13–23% for €400M · CIVIL INFRASTRUCTURE → $30bn precedent · PRIVATE INSURANCE → €4bn uncovered</em></td></tr>
+    <tr><td>1:05</td><td>LIVE: ACTIVE 🔥 LIVE·EFFIS hotspots · staging rings · forecast-day scrub · zoom into Galicia</td><td>"This is the terminal. The red dots are fires burning <strong>right now</strong> — straight from the Copernicus satellite. The map knows the fuel, the people, the hospital behind every power line — and it stages Spain's ten flyable water-bombers where tomorrow looks worst. Before the fire. Not after."</td></tr>
+    <tr><td>1:30</td><td>Budget pour to €400M · instrument chips · honest-ratio chip in frame</td><td>"The slider is the product: four hundred million euros — shepherds, controlled burns, machines, hardening — with the honest corner where prevention <em>doesn't</em> pay shown on screen. Everyone lies to you with round numbers. This screen doesn't."</td></tr>
+    <tr><td>1:52</td><td>PREDICTION tri-panel at 2035 · green saved rows</td><td>"Same money, three futures. Sustained: nearly <strong>half</strong> the exposed people protected. Abandoned — the current path: <strong>six percent</strong>. The difference isn't the climate. It's whether anyone kept paying."</td></tr>
+    <tr><td>2:12</td><td>HISTORIC: press ▶ — year-block rolls, scars land, pause 1972, end Burgohondo</td><td>"And the model isn't a guess. We replayed a hundred and twenty-six years: the sheep leaving, oil replacing firewood, three million hectares of plantations — and in 1972 the fires turn monstrous, exactly where the model glows. Real fires. Real dates."</td></tr>
+    <tr><td>2:32</td><td>ROOTSOURCE half-second scroll → LIVE hotspots → FUSION title card</td><td>"Every number on this screen is public data or a labeled assumption — sources one click away. We spent a century building this fuel. FUSION is how the money finally goes where the fire will be. <strong>The cheapest fire is the one that never starts.</strong> We're FUSION." <em>Overlay: FUSION · the prevention terminal</em></td></tr>
+  </table></div>
+  <p><strong>Fact-basis per beat</strong> (all in ROOTSOURCE / §01): 19.3M WUI-exposed = REAL Kontur total · trillions = the sim's declared €-proxy (say "on our declared books", never as appraisal) · firefighter counts &amp; 10 flyable = verified 19 Sep (official + press; census gap is itself the point) · sheep −37%, 23M sheep-eq vs 2.35M LSU = ERL/Forests 2018/MAPA · forest +33%, &lt;½ of increment harvested = WB/FAO + flow-balance finding · energy-century framing stays qualitative (firewood→fossil transition; no invented EROEI numbers) · 1972 flip = Pausas 2012 · 13–23% and 46%/6% = measured from the model 20 Sep.</p>
+  <h3>Production plan (sponsor double-dip)</h3>
+  <ul>
+    <li><strong>Screen capture:</strong> QuickTime on the demo laptop, 1920×1080, sim v44 single file (works offline — but capture LIVE segments on a good connection so the EFFIS feed is on). Capture per shot, not one take; rehearse the beats above.</li>
+    <li><strong>Voiceover via fal.ai (sponsor)</strong> — generate the VO with a TTS model on fal and the video may double-enter the fal side-challenge <span class="tag verify">VERIFY the fal challenge terms on Discord</span>. Alternative: record a human voice — warmer for judges; decide by ear, keep whichever reads the numbers cleanest.</li>
+    <li><strong>Honesty rule for the video:</strong> screen-capture only — never AI-generate imagery presented as real fire footage. If any AI voice or stylized AI art is used, disclose it in the YT description (also YouTube's synthetic-media policy).</li>
+    <li><strong>Finish:</strong> burned-in captions on every number (400,000 ha · ×10 · 1972 · 10 flyable · 13–23% · 46% vs 6%), royalty-free music low under VO (YouTube Audio Library), cut in CapCut/iMovie.</li>
+    <li><strong>Upload:</strong> unlisted until submission confirmed <span class="tag verify">deadline &amp; visibility rules: Discord</span>. Title: <em>FUSION — Did we fuel the fire? · HackBarna 2026 wildfire track</em>. Description: one-paragraph pitch + team + GitHub repo link + data sources (EFFIS, ESA WorldCover, Kontur, OSM, EGIF/Civio, INE, Prados/BdE) + AI-voice disclosure if applicable.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="secnum">11</span>
+  <h2>The customer — sales one-pager (locked 20 Sep)</h2>
+  <p class="big" style="margin-top:10px"><strong>The customer is the electric utility.</strong> Not the ministry — not first. Utilities have the budget line (vegetation management along their own lines, already spent every year), the board-level fear (PG&amp;E: a line-caused fire, ~$30B in liabilities, bankruptcy), the regulator watching, and <em>no public procurement politics</em>. The state is the user; the utility is the wallet.</p>
+  <div class="tblwrap"><table>
+    <tr><th>element</th><th>the utility version</th></tr>
+    <tr><td><strong>Who exactly (ICP)</strong></td><td>Head of vegetation management / network-risk officer at the TSO (Red Eléctrica) and the big DSOs (Iberdrola i-DE · Endesa e-distribución · Naturgy UFD). One pilot territory, one champion. <span class="tag verify">subsidiary names: standard knowledge, verify before the first email</span></td></tr>
+    <tr><td><strong>Their pain, in their money</strong></td><td>(1) Liability: a line-strike fire is existential — PG&amp;E is the memo every board has read. (2) Blind-ish spend: corridor clearing is bought cyclically, by coverage — some utilities already fly LiDAR/thermography <span class="tag verify">Endesa prior art — verify scope</span>, but none link it to consequence-ranked work orders with an audit trail. (3) Proof: after an incident, they must show the regulator and the court that maintenance was prioritized defensibly — today that evidence is a filing cabinet.</td></tr>
+    <tr><td><strong>The offer (3 modules)</strong></td><td><strong>RANK</strong> — every kilometer of corridor scored by fuel × weather × what fails downstream (the cascade term was BUILT for this: a substation is worth the hospitals behind it). <strong>STAGE</strong> — daily work orders from the 10-day forecast: crews where tomorrow is worst. <strong>LEDGER</strong> — the audit trail: every euro, every corridor, every risk knowingly deferred — signed and dated. The ledger is what they show the regulator; it is the part nobody else sells.</td></tr>
+    <tr><td><strong>Pricing shape</strong></td><td>Paid pilot on one distribution territory (90 days, fixed fee) → annual subscription per territory. Anchor in conversation: a low single-digit % of the existing vegetation-management budget — it re-ranks the other 97%. Never price against damage estimates; price against the budget they already spend blind.</td></tr>
+    <tr><td><strong>Why now</strong></td><td>Two record seasons back-to-back · the three largest fires in the record all since Aug 2025 · insurers repricing wildfire · ten flyable water-bombers until 2028 — response capacity is capped, so risk-ranked prevention is the only lever a utility can buy this year.</td></tr>
+    <tr><td><strong>Competition &amp; moat</strong></td><td>EFFIS/AEMET are free — and are inputs, not decisions. Consultancies sell static PDF risk studies — dead the week after delivery. Our moat: the fused decision layer (live feeds → ranked work orders) plus the accountability ledger, on data the customer can verify because every source is public and cited.</td></tr>
+    <tr><td><strong>Expansion path</strong></td><td>Year 2: the same risk-state feed as an underwriting product for insurers/reinsurers (wildfire repricing is happening now). Year 3: the state — the Pacto de Estado has 80 measures and no allocation instrument; one region as pilot, never "sell to Spain". The video's public framing builds the brand that makes the government deal possible.</td></tr>
+    <tr><td><strong>The demo, sold</strong></td><td>Same sim, utility lens: hover the substation cascade ("this asset = 2 hospitals + 40,000 homes"), scrub to the forecast day, show the work order, end on the LEDGER sentence: <em>"after the next fire, this screen is your defence file."</em></td></tr>
+  </table></div>
+  <p><strong>One-line answer for the jury ("who is the customer?"):</strong> <em>"The utility pays first — vegetation management is an existing budget we make risk-ranked, and PG&amp;E is the board memo. Insurers buy the risk feed second. The state buys the allocation instrument once it exists — and it doesn't, yet. That's us."</em></p>
+</section>
+
+<section>
+  <span class="secnum">12</span>
+  <h2>Grill annex — "They already have the data and ignore it for ideology" (verdict 20 Sep) <span class="tag scan">SCAN</span></h2>
+  <p class="lead">Adversarially researched (4 web lanes + 3 judges). The hypothesis <strong>splits</strong> — and the split reshapes the pitch. Full sources in the research transcript; load-bearing links below.</p>
+  <div class="tblwrap"><table>
+    <tr><th>actor</th><th>verdict</th><th>evidence (grade)</th></tr>
+    <tr><td><strong>The state</strong></td><td><strong>~70% TRUE on data, but the mechanism is NOT ideology.</strong> It runs EGIF (1968→, &gt;150 fields/fire), AEMET's daily danger maps + the new 1-km IPIF (May 2026), mandated ZAR cartography, funded regional plans (PLADIGA, INFOCA) — and demonstrably fails to execute: Galicia's 2018 commission recommendations unexecuted, its dynamic-risk-map law shelved 2+ yrs, an investigation into the 2025 season vetoed, 80% of high-risk municipalities without mandated plans. Drivers documented: <strong>incentive asymmetry</strong> (extinction is televised, prevention invisible — WWF 2026: ~78% to extinction), <strong>fragmentation</strong> (17 systems, blame diffusion), <strong>accountability avoidance</strong> (vetoed inquiries, undisclosed execution). "Ideology" shows up mainly as post-fire blame theater (the 2025 "Agenda-2030 forbids cleaning forests" disinfo wave — debunked by Maldita); the big ENGOs (WWF, Greenpeace) actually DEMAND prescribed burns and grazing.</td><td>MITECO EGIF page · AEMET IPIF release · galiciapress/eldiario Galicia record · Greenpeace 2018 compliance report · Maldita debunks (all SCAN)</td></tr>
+    <tr><td><strong>Insurers</strong></td><td><strong>FALSE — the gap is real, and it is closing.</strong> No major cat-model vendor ships a Spanish/European wildfire model (Moody's RMS &amp; Verisk: North America + Australia only); the only European models are 2024–25 startup products; Gen Re calls the data incomplete and EFFIS awareness-grade, not a pricing input. Why they never built it: incentive — wildfire sits inside the generic fire peril, penetration is LOWEST in fire provinces (~60% Orense/Cáceres vs ~79.5% national), and insured losses were small until 2025 (~€5bn economic, &lt;€1bn insured — Marsh). <strong>Named competitive set, already selling: Reask (EU wildfire model, early 2025) · Mitiga Solutions (BCN, Howden client) · SilvIA (parcel-level vegetation pricing).</strong></td><td>consorseguros.es · Moody's/Verisk product pages · InsuranceJournal/Marsh · Gen Re · reask.earth · silviaearth.com (SCAN/SNIPPET as marked)</td></tr>
+    <tr><td><strong>The adoption law</strong></td><td><strong>Decision layers change behavior ONLY when liability, mandate or payment attaches.</strong> California: utility risk capability sat idle a decade; SB901/AB1054 mandated model-based, regulator-audited mitigation plans → ~$16bn spend in 5 yrs. Insurers act ruthlessly on model scores the moment money attaches (CoreLogic/FireLine/Z-FIRE-driven non-renewals). Portugal: trauma opened the window, analysis steered the money — €264M→€647M, now 58/42 prevention-first. This is the empirical justification for our buyer ladder AND for the LEDGER being the product, not a feature.</td><td>CA Assembly oversight PDF · uphelp.org rate filings · EEA climate-adapt Portugal case (SCAN)</td></tr>
+  </table></div>
+  <h3>What we changed because of this grill</h3>
+  <ul>
+    <li><strong>Deleted every "they lack data" claim.</strong> The state has data; we sell fusion-across-silos + the risk→euro→execution audit link — the gap the Pacto itself names. Judge counter #1 rewritten accordingly.</li>
+    <li><strong>"Ideology" is out as a thesis</strong> — the evidence shows incentives, fragmentation and accountability avoidance. We keep the disinfo wave as context: any decision layer will operate in a contested-information environment — which makes the cited-provenance ledger MORE valuable, not less.</li>
+    <li><strong>Insurer pitch sharpened:</strong> real whitespace, closing fast — we name Reask/Mitiga/SilvIA as the competitive set and differentiate on the consequence-cascade + execution ledger, not raw hazard.</li>
+    <li><strong>Provenance tightening:</strong> the €364M→€144M (2009–24) series keeps its source (WWF via The Conversation) but now carries a cross-check note: an alternative sourced series reads €364M (2009) → €142M (2011) → ~€175M (2022) (forescat). If challenged, say "prevention runs at roughly a third of its 2009 level" — true on either series. WWF 2026 states a 78/12 split vs our earlier 78/22 — accounting scopes differ; cite WWF explicitly either way.</li>
+    <li><strong>The strongest counter, carried openly:</strong> (a) "revealed preference IS ideology" — fine: whatever the label, the fix is identical — attach money, mandate or liability to the map, which is what FUSION operationalizes; (b) darker: a state actor that vetoes investigations may not WANT an accountability ledger — which is precisely why the buyer ladder starts with utilities and insurers, who want the defence file, and reaches the state through the Pacto's own self-diagnosis.</li>
+  </ul>
+</section>
+
+<p class="footer">FUSION · HackBarna wildfire track · spec v31 (§10 customer block reordered: state → civil infrastructure → private insurance) (research-grounded · fleet-verified · pitch numbers re-measured 20 Sep: ratio 0.4–3.1:1, risk-removed 13–23% @ €400M, prediction 46% vs 6% · <strong>hook &amp; use case rewritten around LIVE/fork 2: open on the real EFFIS hotspots</strong>) · 19–20 Sep 2026 · team of 3 · rules: GitHub repo, no previous work, max 3 — all satisfied. Judging: Impact / Implementation / Creativity. Interactive reference sim: shared separately (three views, two-arm LIVE, portfolio allocator, explain-me tooltips).</p>
+</div>
