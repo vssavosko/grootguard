@@ -416,7 +416,7 @@ export function WorldMap() {
         zIndex="1"
       >
         <Box as="p" fontSize="sm" fontWeight="semibold" letterSpacing="widest">
-          FIREWARD · SPAIN
+          GROOTGUARD · SPAIN
         </Box>
         {/* Fixed width: long copy inside used to stretch this card across the map. */}
         <Flex
