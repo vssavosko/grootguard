@@ -16,8 +16,7 @@ const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
  * Summary of the season's burnt footprint.
  *
  * The whole season is drawn at once rather than behind a month filter: the
- * footprint is the context for today's fires, and per-fire dates are already
- * one hover away on the map itself.
+ * footprint is the context for today's fires.
  *
  * The parent status card is `pointer-events: none` so the map stays draggable
  * under it, so anything interactive here has to opt back in explicitly.
@@ -84,7 +83,7 @@ export function SeasonControl({ season, status, visible, onToggle }: Props) {
         {number.format(Math.round(season.totalAreaHa / 100))} km²
       </Box>
       <Box color="slate.500" fontSize="2xs">
-        Hover for dates. Archive starts 10 Jun 2026.
+        Seasonal satellite footprint. Archive starts 10 Jun 2026.
       </Box>
     </Flex>
   );

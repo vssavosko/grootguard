@@ -19,29 +19,10 @@ import {
   setSelectedAnalyticsCell,
   type WeatherSeries,
 } from "@/lib/analytics-layer";
-import {
-  type AnalyticsSnapshot,
-  type FirePopupProperties,
-  firePopupHtml,
-} from "@/lib/fire-popup";
+import { type FireCollection, toFireCoverage } from "@/lib/fire-coverage";
 
-type Position = [number, number];
-type FireProperties = {
-  observed_watermark?: string;
-  n_hotspots?: number;
-  area_m2?: number;
-};
-
-/**
- * Zoom band over which the heat glow hands off to measured perimeters. Below
- * the start the glow carries everything; above the end only real geometry shows.
- */
-const FIRE_GLOW_FADE_START = 7.5;
-const FIRE_GLOW_FADE_END = 9.5;
 /** Where a ranked-zone click lands, close enough to read the cell. */
 const ZONE_FLY_TO_ZOOM = 9;
-/** Shared by the live perimeter outline and the past-burn rings. */
-const FIRE_STROKE_COLOUR = "#ff6a3d";
 
 export type SeasonCollection = {
   season: number;
@@ -49,92 +30,7 @@ export type SeasonCollection = {
   totalAreaHa: number;
   features: unknown[];
 };
-type FireGeometry =
-  | { type: "Polygon"; coordinates: Position[][] }
-  | { type: "MultiPolygon"; coordinates: Position[][][] };
-type FireFeature = {
-  type: "Feature";
-  geometry: FireGeometry;
-  properties: FireProperties;
-};
-type FireCollection = { type: "FeatureCollection"; features: FireFeature[] };
-type CentroidCollection = {
-  type: "FeatureCollection";
-  features: Array<{
-    type: "Feature";
-    geometry: { type: "Point"; coordinates: Position };
-    properties: FireProperties;
-  }>;
-};
 
-function visitPositions(value: unknown, positions: Position[]) {
-  if (
-    Array.isArray(value) &&
-    value.length >= 2 &&
-    typeof value[0] === "number" &&
-    typeof value[1] === "number"
-  )
-    positions.push([value[0], value[1]]);
-  else if (Array.isArray(value))
-    for (const item of value) visitPositions(item, positions);
-}
-/**
- * Centroids for the season polygons, so past burns can be drawn as rings sized
- * by burnt area rather than as polygon outlines.
- */
-function toPointFeatures(features: unknown[]) {
-  return features.flatMap((feature) => {
-    const typed = feature as {
-      geometry?: { coordinates?: unknown };
-      properties?: Record<string, unknown>;
-    };
-    const positions: Position[] = [];
-    visitPositions(typed.geometry?.coordinates, positions);
-    if (!positions.length) return [];
-    const [longitude, latitude] = positions.reduce(
-      ([lng, lat], [nextLng, nextLat]) => [
-        lng + nextLng / positions.length,
-        lat + nextLat / positions.length,
-      ],
-      [0, 0],
-    );
-    return [
-      {
-        type: "Feature" as const,
-        geometry: {
-          type: "Point" as const,
-          coordinates: [longitude, latitude],
-        },
-        properties: typed.properties ?? {},
-      },
-    ];
-  });
-}
-
-function toCentroids(collection: FireCollection): CentroidCollection {
-  return {
-    type: "FeatureCollection",
-    features: collection.features.flatMap((feature) => {
-      const positions: Position[] = [];
-      visitPositions(feature.geometry.coordinates, positions);
-      if (!positions.length) return [];
-      const [longitude, latitude] = positions.reduce(
-        ([lng, lat], [nextLng, nextLat]) => [
-          lng + nextLng / positions.length,
-          lat + nextLat / positions.length,
-        ],
-        [0, 0],
-      );
-      return [
-        {
-          type: "Feature",
-          geometry: { type: "Point", coordinates: [longitude, latitude] },
-          properties: feature.properties,
-        },
-      ];
-    }),
-  };
-}
 export function WorldMap() {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -162,17 +58,6 @@ export function WorldMap() {
     "loading" | "error" | "ready"
   >("loading");
   const [seasonVisible, setSeasonVisible] = useState(true);
-
-  /** The map effect runs once, so hover reads cells through a ref, not state. */
-  const analyticsRef = useRef<AnalyticsSnapshot>({ data: null, lookup: null });
-  useEffect(() => {
-    analyticsRef.current = {
-      data: analytics.data,
-      lookup: analytics.data
-        ? new Map(analytics.data.cells.map((cell, index) => [cell, index]))
-        : null,
-    };
-  }, [analytics.data]);
 
   /** Centre the map on a ranked zone so a Top-zones click goes somewhere. */
   const focusCell = (index: number) => {
@@ -210,17 +95,14 @@ export function WorldMap() {
     const map = mapRef.current;
     if (!map || !layersReady || !season) return;
     (
-      map.getSource("season-centroids") as mapboxgl.GeoJSONSource | undefined
-    )?.setData({
-      type: "FeatureCollection",
-      features: toPointFeatures(season.features),
-    } as Parameters<mapboxgl.GeoJSONSource["setData"]>[0]);
+      map.getSource("season-coverage") as mapboxgl.GeoJSONSource | undefined
+    )?.setData(toFireCoverage(season, 6));
   }, [season, layersReady]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !layersReady) return;
-    for (const id of ["season-circles"]) {
+    for (const id of ["season-coverage-fill", "season-coverage-line"]) {
       if (!map.getLayer(id)) continue;
       map.setLayoutProperty(
         id,
@@ -315,13 +197,13 @@ export function WorldMap() {
       });
     const setMapData = (perimeters: FireCollection) => {
       if (!map) return;
-      (map.getSource("fire-perimeters") as mapboxgl.GeoJSONSource).setData(
-        perimeters as unknown as Parameters<
+      (map.getSource("fire-coverage-overview") as mapboxgl.GeoJSONSource).setData(
+        toFireCoverage(perimeters, 5) as unknown as Parameters<
           mapboxgl.GeoJSONSource["setData"]
         >[0],
       );
-      (map.getSource("fire-centroids") as mapboxgl.GeoJSONSource).setData(
-        toCentroids(perimeters) as unknown as Parameters<
+      (map.getSource("fire-coverage-detail") as mapboxgl.GeoJSONSource).setData(
+        toFireCoverage(perimeters, 7) as unknown as Parameters<
           mapboxgl.GeoJSONSource["setData"]
         >[0],
       );
@@ -352,80 +234,37 @@ export function WorldMap() {
         map.on("load", () => {
           const loadedMap = map;
           if (!loadedMap) return;
-          loadedMap.addSource("fire-perimeters", {
+          loadedMap.addSource("fire-coverage-overview", {
             type: "geojson",
-            data: initialPerimeters,
+            data: toFireCoverage(initialPerimeters, 5),
           });
-          loadedMap.addSource("fire-centroids", {
+          loadedMap.addSource("fire-coverage-detail", {
             type: "geojson",
-            data: toCentroids(initialPerimeters),
+            data: toFireCoverage(initialPerimeters, 7),
           });
-          loadedMap.addSource("season-centroids", {
+          loadedMap.addSource("season-coverage", {
             type: "geojson",
             data: { type: "FeatureCollection", features: [] },
           });
-          // Past burns are drawn as hollow circles sized by burnt area, in the
-          // same stroke colour as a live perimeter: same family, but a ring
-          // rather than a filled shape, so "burning now" still reads first.
           loadedMap.addLayer({
-            id: "season-circles",
-            type: "circle",
-            source: "season-centroids",
+            id: "season-coverage-fill",
+            type: "fill",
+            source: "season-coverage",
             paint: {
-              "circle-color": "rgba(0,0,0,0)",
-              "circle-stroke-color": FIRE_STROKE_COLOUR,
-              "circle-stroke-opacity": 0.85,
-              "circle-stroke-width": 1.2,
-              "circle-emissive-strength": 1,
-              // Radius tracks sqrt(area) so the ring area reads proportionally.
-              "circle-radius": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                5,
-                [
-                  "interpolate",
-                  ["linear"],
-                  ["sqrt", ["coalesce", ["get", "area_ha"], 1]],
-                  1,
-                  1.5,
-                  30,
-                  4,
-                  280,
-                  11,
-                ],
-                10,
-                [
-                  "interpolate",
-                  ["linear"],
-                  ["sqrt", ["coalesce", ["get", "area_ha"], 1]],
-                  1,
-                  4,
-                  30,
-                  13,
-                  280,
-                  34,
-                ],
-              ],
+              "fill-color": "#98513b",
+              "fill-emissive-strength": 0.35,
+              "fill-opacity": 0.46,
             },
           });
           loadedMap.addLayer({
-            id: "fire-perimeter-fill",
-            type: "fill",
-            source: "fire-perimeters",
+            id: "season-coverage-line",
+            type: "line",
+            source: "season-coverage",
             paint: {
-              "fill-color": "#ff3b30",
-              "fill-emissive-strength": 1,
-              // Hidden while the glow carries the story, then takes over.
-              "fill-opacity": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                FIRE_GLOW_FADE_START,
-                0,
-                FIRE_GLOW_FADE_END,
-                0.55,
-              ],
+              "line-color": "#e8ad79",
+              "line-emissive-strength": 0.45,
+              "line-opacity": 0.72,
+              "line-width": 0.85,
             },
           });
           void analyticsPromise.then((snapshot) => {
@@ -434,7 +273,7 @@ export function WorldMap() {
               loadedMap,
               snapshot.data,
               snapshot.clips,
-              "fire-perimeter-fill",
+              "fire-coverage-overview-fill",
             );
             setAnalyticsLayer(loadedMap, activeLayerRef.current);
             setSelectedAnalyticsCell(loadedMap, selectedRef.current);
@@ -454,117 +293,97 @@ export function WorldMap() {
             });
           });
           loadedMap.addLayer({
-            id: "fire-perimeter-line",
+            id: "fire-coverage-overview-halo",
             type: "line",
-            source: "fire-perimeters",
+            source: "fire-coverage-overview",
             paint: {
-              "line-color": FIRE_STROKE_COLOUR,
+              "line-color": "#ff8a3d",
               "line-emissive-strength": 1,
-              // Invisible under the glow, then sharpens as the glow fades.
               "line-opacity": [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                FIRE_GLOW_FADE_START,
+                5.8,
+                0.32,
+                6.8,
                 0,
-                FIRE_GLOW_FADE_END,
-                1,
               ],
-              "line-width": 1.6,
+              "line-width": 4,
             },
           });
-          // Heat glow replaces the old centroid dots: a diffuse field at country
-          // zoom that hands over to the measured perimeter as you zoom in, so
-          // nothing ever reads as a pin at a precision the data does not have.
           loadedMap.addLayer({
-            id: "fire-glow",
-            type: "heatmap",
-            source: "fire-centroids",
+            id: "fire-coverage-overview-fill",
+            type: "fill",
+            source: "fire-coverage-overview",
             paint: {
-              "heatmap-weight": [
-                "interpolate",
-                ["linear"],
-                ["coalesce", ["get", "n_hotspots"], 1],
-                1,
-                0.25,
-                50,
-                0.6,
-                500,
-                1,
-              ],
-              "heatmap-intensity": [
+              "fill-color": "#f4512c",
+              "fill-emissive-strength": 1.2,
+              "fill-opacity": [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                4,
-                1,
-                FIRE_GLOW_FADE_END,
-                2.4,
-              ],
-              "heatmap-color": [
-                "interpolate",
-                ["linear"],
-                ["heatmap-density"],
-                0,
-                "rgba(0,0,0,0)",
-                0.2,
-                "rgba(120,30,10,0.55)",
-                0.45,
-                "rgba(214,78,22,0.75)",
-                0.7,
-                "rgba(249,140,42,0.88)",
-                1,
-                "rgba(255,226,150,0.95)",
-              ],
-              "heatmap-radius": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                4,
-                14,
-                7,
-                26,
-                FIRE_GLOW_FADE_END,
-                44,
-              ],
-              "heatmap-opacity": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                FIRE_GLOW_FADE_START,
-                0.95,
-                FIRE_GLOW_FADE_END,
+                5.8,
+                0.76,
+                6.8,
                 0,
               ],
             },
           });
-          const hoverPopup = new mapboxgl.Popup({
-            closeButton: false,
-            closeOnClick: false,
-            maxWidth: "280px",
-            offset: 12,
+          loadedMap.addLayer({
+            id: "fire-coverage-overview-line",
+            type: "line",
+            source: "fire-coverage-overview",
+            paint: {
+              "line-color": "#ffd18a",
+              "line-emissive-strength": 1.2,
+              "line-opacity": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                5.8,
+                0.95,
+                6.8,
+                0,
+              ],
+              "line-width": 1.25,
+            },
           });
-          const FIRE_HOVER_LAYERS = ["fire-perimeter-fill", "season-circles"];
-          loadedMap.on("mousemove", FIRE_HOVER_LAYERS, (event) => {
-            const feature = event.features?.[0];
-            if (!feature) return;
-            loadedMap.getCanvas().style.cursor = "pointer";
-            hoverPopup
-              .setLngLat(event.lngLat)
-              .setHTML(
-                firePopupHtml(
-                  (feature as unknown as { properties: FirePopupProperties })
-                    .properties,
-                  event.lngLat.lat,
-                  event.lngLat.lng,
-                  analyticsRef.current,
-                ),
-              )
-              .addTo(loadedMap);
+          loadedMap.addLayer({
+            id: "fire-coverage-detail-fill",
+            type: "fill",
+            source: "fire-coverage-detail",
+            paint: {
+              "fill-color": "#ff4d24",
+              "fill-emissive-strength": 1,
+              "fill-opacity": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                5.8,
+                0,
+                6.8,
+                0.8,
+              ],
+            },
           });
-          loadedMap.on("mouseleave", FIRE_HOVER_LAYERS, () => {
-            loadedMap.getCanvas().style.cursor = "";
-            hoverPopup.remove();
+          loadedMap.addLayer({
+            id: "fire-coverage-detail-line",
+            type: "line",
+            source: "fire-coverage-detail",
+            paint: {
+              "line-color": "#ffe1a6",
+              "line-emissive-strength": 1.5,
+              "line-opacity": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                5.8,
+                0,
+                6.8,
+                0.95,
+              ],
+              "line-width": 1,
+            },
           });
           setMapData(initialPerimeters);
           refreshId = setInterval(() => void refresh(), 60_000);
