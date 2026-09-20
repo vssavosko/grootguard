@@ -1,13 +1,18 @@
 import { cellToBoundary } from "h3-js";
 import type mapboxgl from "mapbox-gl";
+import { priority as priorityOf, rankChanges } from "@/lib/weather-model";
 
 export type AnalyticsLayerKey =
   | "priority"
   | "fuel"
   | "weather"
   | "moisture"
+  | "soil-water"
   | "population-assets"
   | null;
+
+/** Rank deltas compare a date with the same weekday one week earlier. */
+export const RANK_COMPARISON_DAYS = 7;
 export type SelectedCell = {
   index: number;
   longitude: number;
@@ -22,8 +27,16 @@ export type PreparedCells = {
   land_frac: number[];
   area_ha: number[];
   pop: number[];
+  /** Population weighted by the burnable fraction of the cell. */
+  pop_exposed: number[];
+  /** Population within 10 km, for surrounding exposure. */
+  pop10km: number[];
   assets: number[][];
   asset_classes: string[];
+  asset_score: number[];
+  /** Index into `asset_classes` for the cell's most significant asset. */
+  top_asset: number[];
+  top_asset_name: Array<string | null>;
   name: Array<string | null>;
   province: Array<string | null>;
   C: number[];
@@ -36,17 +49,42 @@ export type CellClips = {
   excluded: string[];
   clipped: Record<string, Position[][][]>;
 };
-export type WeatherSnapshot = {
+export type DayKind = "observed" | "combined" | "forecast";
+export type PointDay = {
+  date: string;
+  kind: DayKind;
+  maxTemperature: number | null;
+  humidity: number | null;
+  maxWind: number | null;
+  precipitation: number | null;
+  daysSinceRain: number | null;
+  precipitation30Day: number | null;
+  weather: number | null;
+  moisture: number | null;
+};
+/** Client-side mirror of the `/api/weather` payload. */
+export type WeatherSeries = {
+  /** True when the series came from a recorded fixture, not the provider. */
+  fixture?: boolean;
   generatedAt: string;
-  cutoff: string;
+  today: string;
+  dates: string[];
+  todayIndex: number;
+  baselineSource: "climatology" | "rolling";
   moistureObservedAt: string;
-  points: Array<{
-    current: { weather: number | null; moisture: number | null };
-  }>;
+  regional: Array<{ latitude: number; longitude: number; days: PointDay[] }>;
+  points: Array<{ regional: number; soilWaterIndex: number | null }>;
 };
 export type DynamicCells = {
+  /** Fire-weather factor W for the selected date. */
   weather: Array<number | null>;
+  /** Moisture factor M for the selected date. */
   moisture: Array<number | null>;
+  /** Observed Copernicus soil water index; not part of the timeline. */
+  soilWater: Array<number | null>;
+  priority: Array<number | null>;
+  previousPriority: Array<number | null>;
+  rankChange: Array<number | null>;
 };
 
 type AnalyticsFeature = {
@@ -63,6 +101,7 @@ type AnalyticsFeature = {
     data_status: "ready" | "no-data";
     weather: number | null;
     moisture: number | null;
+    soil_water: number | null;
     priority: number | null;
     previous_priority: number | null;
     rank_change: number | null;
@@ -76,12 +115,14 @@ const ASSET_LAYER_ID = "spain-assets";
 const PRIORITY_LAYER_ID = "spain-priority";
 const WEATHER_LAYER_ID = "spain-weather";
 const MOISTURE_LAYER_ID = "spain-moisture";
+const SOIL_WATER_LAYER_ID = "spain-soil-water";
 const SELECTED_LAYER_ID = "spain-analytics-selected";
 export const ANALYTICS_INTERACTIVE_LAYER_IDS = [
   PRIORITY_LAYER_ID,
   FUEL_LAYER_ID,
   WEATHER_LAYER_ID,
   MOISTURE_LAYER_ID,
+  SOIL_WATER_LAYER_ID,
   POPULATION_LAYER_ID,
 ];
 
@@ -89,20 +130,73 @@ export function fuelIndex(tree: number, shrub: number, grass: number) {
   return tree + 0.8 * shrub + 0.5 * grass;
 }
 
+const finiteOrNull = (value: number | null | undefined) =>
+  typeof value === "number" && Number.isFinite(value) ? value : null;
+
+/**
+ * Expand the regional weather series onto every cell for one date, and derive
+ * the prevention priority from it.
+ *
+ * `priority = F * W * (0.4 + 0.6 * (1 - M)) * C`, exactly as the design spec
+ * states. A cell whose weather point has no usable W or M is excluded from the
+ * ranking rather than scored as zero.
+ */
 export function createDynamicCells(
   data: PreparedCells,
-  snapshot: WeatherSnapshot,
+  series: WeatherSeries,
+  dateIndex: number,
 ): DynamicCells {
-  const valid = snapshot.points.length === data.weather_points.length;
-  const read = (index: number, key: "weather" | "moisture") => {
-    const value = valid
-      ? snapshot.points[data.wpt[index]]?.current[key]
-      : undefined;
-    return typeof value === "number" && Number.isFinite(value) ? value : null;
+  const aligned = series.points.length === data.weather_points.length;
+  const dayAt = (cellIndex: number, index: number): PointDay | undefined => {
+    if (!aligned || index < 0) return undefined;
+    const point = series.points[data.wpt[cellIndex]];
+    return series.regional[point?.regional ?? -1]?.days[index];
   };
-  const weather = data.cells.map((_, index) => read(index, "weather"));
-  const moisture = data.cells.map((_, index) => read(index, "moisture"));
-  return { weather, moisture };
+  const previousIndex = Math.max(0, dateIndex - RANK_COMPARISON_DAYS);
+
+  const scoreAt = (cellIndex: number, index: number) => {
+    const day = dayAt(cellIndex, index);
+    const weather = finiteOrNull(day?.weather);
+    const moisture = finiteOrNull(day?.moisture);
+    const fuel = finiteOrNull(
+      fuelIndex(
+        data.tree[cellIndex],
+        data.shrub[cellIndex],
+        data.grass[cellIndex],
+      ),
+    );
+    const consequence = finiteOrNull(data.C[cellIndex]);
+    return weather === null ||
+      moisture === null ||
+      fuel === null ||
+      consequence === null
+      ? null
+      : priorityOf(fuel, weather, moisture, consequence);
+  };
+
+  const weather = data.cells.map((_, index) =>
+    finiteOrNull(dayAt(index, dateIndex)?.weather),
+  );
+  const moisture = data.cells.map((_, index) =>
+    finiteOrNull(dayAt(index, dateIndex)?.moisture),
+  );
+  const soilWater = data.cells.map((_, index) =>
+    aligned
+      ? finiteOrNull(series.points[data.wpt[index]]?.soilWaterIndex)
+      : null,
+  );
+  const priority = data.cells.map((_, index) => scoreAt(index, dateIndex));
+  const previousPriority = data.cells.map((_, index) =>
+    scoreAt(index, previousIndex),
+  );
+  return {
+    weather,
+    moisture,
+    soilWater,
+    priority,
+    previousPriority,
+    rankChange: rankChanges(priority, previousPriority),
+  };
 }
 
 export function createAnalyticsFeatures(
@@ -140,9 +234,10 @@ export function createAnalyticsFeatures(
           data_status: ready ? "ready" : "no-data",
           weather: dynamic?.weather[index] ?? null,
           moisture: dynamic?.moisture[index] ?? null,
-          priority: null,
-          previous_priority: null,
-          rank_change: null,
+          soil_water: dynamic?.soilWater[index] ?? null,
+          priority: dynamic?.priority[index] ?? null,
+          previous_priority: dynamic?.previousPriority[index] ?? null,
+          rank_change: dynamic?.rankChange[index] ?? null,
         },
       },
     ];
@@ -247,15 +342,15 @@ export function addAnalyticsLayer(
             "interpolate",
             ["linear"],
             ["get", "weather"],
-            -5,
+            0.6,
             "#1d4ed8",
-            5,
+            0.9,
             "#38bdf8",
-            15,
+            1.1,
             "#facc15",
-            25,
+            1.35,
             "#f97316",
-            35,
+            1.6,
             "#dc2626",
           ],
           "#64748b",
@@ -280,6 +375,37 @@ export function addAnalyticsLayer(
             "interpolate",
             ["linear"],
             ["get", "moisture"],
+            0,
+            "#dc2626",
+            0.35,
+            "#facc15",
+            0.7,
+            "#38bdf8",
+            1,
+            "#2563eb",
+          ],
+          "#64748b",
+        ],
+        "fill-emissive-strength": 1,
+        "fill-opacity": 0.6,
+      },
+    },
+    beforeLayerId,
+  );
+  map.addLayer(
+    {
+      id: SOIL_WATER_LAYER_ID,
+      type: "fill",
+      source: SOURCE_ID,
+      layout: { visibility: "none" },
+      paint: {
+        "fill-color": [
+          "case",
+          ["!=", ["get", "soil_water"], null],
+          [
+            "interpolate",
+            ["linear"],
+            ["get", "soil_water"],
             0,
             "#dc2626",
             25,
@@ -354,6 +480,7 @@ export function setAnalyticsLayer(map: mapboxgl.Map, key: AnalyticsLayerKey) {
   visibility(map, FUEL_LAYER_ID, key === "fuel");
   visibility(map, WEATHER_LAYER_ID, key === "weather");
   visibility(map, MOISTURE_LAYER_ID, key === "moisture");
+  visibility(map, SOIL_WATER_LAYER_ID, key === "soil-water");
   visibility(map, POPULATION_LAYER_ID, key === "population-assets");
   visibility(map, ASSET_LAYER_ID, key === "population-assets");
 }

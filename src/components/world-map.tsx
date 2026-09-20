@@ -1,9 +1,10 @@
 "use client";
 
 import mapboxgl from "mapbox-gl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Flex } from "styled-system/jsx";
 import { AnalyticsLayerControl } from "@/components/analytics-layer-control";
+import { Timeline } from "@/components/timeline";
 import {
   ANALYTICS_INTERACTIVE_LAYER_IDS,
   type AnalyticsLayerKey,
@@ -14,7 +15,7 @@ import {
   setAnalyticsLayer,
   setDynamicAnalyticsData,
   setSelectedAnalyticsCell,
-  type WeatherSnapshot,
+  type WeatherSeries,
 } from "@/lib/analytics-layer";
 
 type Position = [number, number];
@@ -103,8 +104,29 @@ export function WorldMap() {
   const [weatherStatus, setWeatherStatus] = useState<
     "loading" | "error" | "ready"
   >("loading");
-  const [weatherSnapshot, setWeatherSnapshot] =
-    useState<WeatherSnapshot | null>(null);
+  const [weatherSeries, setWeatherSeries] = useState<WeatherSeries | null>(
+    null,
+  );
+  const [dateIndex, setDateIndex] = useState<number | null>(null);
+  const [layersReady, setLayersReady] = useState(false);
+
+  /** Defaults to today the first time the series arrives. */
+  const activeDateIndex = dateIndex ?? weatherSeries?.todayIndex ?? 0;
+
+  const dynamic = useMemo(
+    () =>
+      analytics.data && weatherSeries
+        ? createDynamicCells(analytics.data, weatherSeries, activeDateIndex)
+        : null,
+    [analytics.data, weatherSeries, activeDateIndex],
+  );
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !layersReady || !analytics.data || !analytics.clips || !dynamic)
+      return;
+    setDynamicAnalyticsData(map, analytics.data, analytics.clips, dynamic);
+  }, [analytics.data, analytics.clips, dynamic, layersReady]);
 
   useEffect(() => {
     activeLayerRef.current = activeLayer;
@@ -150,21 +172,28 @@ export function WorldMap() {
           setAnalytics({ status: "error", data: null, clips: null });
         return null;
       });
-    const weatherPromise = fetch("/api/weather")
+    void fetch("/api/weather")
       .then(async (response) => {
         if (!response.ok) throw new Error("Weather request failed");
-        return (await response.json()) as WeatherSnapshot;
+        const payload = (await response.json()) as WeatherSeries;
+        // A cached response from an older deployment can arrive with a shape
+        // this build no longer understands; treat that as unavailable.
+        if (
+          !Array.isArray(payload?.dates) ||
+          !Array.isArray(payload?.regional) ||
+          !Array.isArray(payload?.points) ||
+          payload.dates.length === 0
+        )
+          throw new Error("Weather payload is not a usable series");
+        return payload;
       })
-      .then((snapshot) => {
-        if (!cancelled) {
-          setWeatherSnapshot(snapshot);
-          setWeatherStatus("ready");
-        }
-        return snapshot;
+      .then((series) => {
+        if (cancelled) return;
+        setWeatherSeries(series);
+        setWeatherStatus("ready");
       })
       .catch(() => {
         if (!cancelled) setWeatherStatus("error");
-        return null;
       });
     const setMapData = (perimeters: FireCollection) => {
       if (!map) return;
@@ -233,15 +262,7 @@ export function WorldMap() {
             );
             setAnalyticsLayer(loadedMap, activeLayerRef.current);
             setSelectedAnalyticsCell(loadedMap, selectedRef.current);
-            void weatherPromise.then((weather) => {
-              if (!weather || cancelled) return;
-              setDynamicAnalyticsData(
-                loadedMap,
-                snapshot.data,
-                snapshot.clips,
-                createDynamicCells(snapshot.data, weather),
-              );
-            });
+            setLayersReady(true);
             loadedMap.on("click", ANALYTICS_INTERACTIVE_LAYER_IDS, (event) => {
               const feature = event.features?.[0] as
                 | { properties?: { index?: number } }
@@ -361,11 +382,20 @@ export function WorldMap() {
       <AnalyticsLayerControl
         activeLayer={activeLayer}
         data={analytics.data}
+        dateIndex={activeDateIndex}
+        dynamic={dynamic}
         selectedIndex={selectedIndex}
+        series={weatherSeries}
         status={analytics.status}
         weatherStatus={weatherStatus}
-        weatherSnapshot={weatherSnapshot}
         onLayerChange={setActiveLayer}
+        onSelectCell={setSelectedIndex}
+      />
+      <Timeline
+        dateIndex={activeDateIndex}
+        series={weatherSeries}
+        status={weatherStatus}
+        onDateIndexChange={setDateIndex}
       />
     </Box>
   );

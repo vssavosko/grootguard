@@ -1,0 +1,244 @@
+{
+  "builtAt": "2026-09-20T08:27:16.822Z",
+  "years": [2023, 2025],
+  "source": "Open-Meteo ERA5 archive",
+  "variables": [
+    "temperature_2m_max",
+    "relative_humidity_2m_mean",
+    "wind_speed_10m_max",
+    "precipitation_sum"
+  ],
+  "complete": true,
+  "points": [
+    {
+      "latitude": 43.32777746577062,
+      "longitude": -1.164164280865192,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 19.1212591240876,
+          "standardDeviation": 6.554922000238066
+        },
+        "humidity": {
+          "mean": 79.13412408759125,
+          "standardDeviation": 9.793361549394415
+        },
+        "maxWind": {
+          "mean": 15.84105839416058,
+          "standardDeviation": 6.67320825157232
+        },
+        "daysSinceRain": {
+          "mean": 2.165296803652968,
+          "standardDeviation": 3.12817236654728
+        }
+      }
+    },
+    {
+      "latitude": 35.761693377508614,
+      "longitude": -5.610670341931284,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 21.660310218978108,
+          "standardDeviation": 5.576786766023176
+        },
+        "humidity": {
+          "mean": 80.32755474452554,
+          "standardDeviation": 9.346015186171147
+        },
+        "maxWind": {
+          "mean": 19.621806569343068,
+          "standardDeviation": 7.138656001659549
+        },
+        "daysSinceRain": {
+          "mean": 8.805479452054794,
+          "standardDeviation": 13.271026811215735
+        }
+      }
+    },
+    {
+      "latitude": 43.17089510161936,
+      "longitude": -9.352404913591641,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 16.097262773722626,
+          "standardDeviation": 2.2181878800263815
+        },
+        "humidity": {
+          "mean": 82.75273722627738,
+          "standardDeviation": 8.943965454709566
+        },
+        "maxWind": {
+          "mean": 37.25091240875916,
+          "standardDeviation": 13.982669118013934
+        },
+        "daysSinceRain": {
+          "mean": 3.497262773722628,
+          "standardDeviation": 5.4236565988042535
+        }
+      }
+    },
+    {
+      "latitude": 39.30591116795076,
+      "longitude": 4.504750593350245,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 20.246532846715347,
+          "standardDeviation": 4.597899673710274
+        },
+        "humidity": {
+          "mean": 76.04379562043796,
+          "standardDeviation": 9.004758363471307
+        },
+        "maxWind": {
+          "mean": 29.97071167883214,
+          "standardDeviation": 12.548997758745012
+        },
+        "daysSinceRain": {
+          "mean": 9.038602941176471,
+          "standardDeviation": 12.40998392381729
+        }
+      }
+    },
+    {
+      "latitude": 38.52249472227993,
+      "longitude": -0.8284347394989525,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 22.288959854014568,
+          "standardDeviation": 7.108659801507649
+        },
+        "humidity": {
+          "mean": 64.68613138686132,
+          "standardDeviation": 13.994655822962413
+        },
+        "maxWind": {
+          "mean": 18.76587591240873,
+          "standardDeviation": 5.72625880712775
+        },
+        "daysSinceRain": {
+          "mean": 10.594569288389513,
+          "standardDeviation": 12.441527978807368
+        }
+      }
+    },
+    {
+      "latitude": 40.8924161035877,
+      "longitude": -4.88084704688557,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 19.147536496350373,
+          "standardDeviation": 8.53233936848699
+        },
+        "humidity": {
+          "mean": 63.893248175182485,
+          "standardDeviation": 17.056863625785027
+        },
+        "maxWind": {
+          "mean": 17.058302919708023,
+          "standardDeviation": 7.00649102354268
+        },
+        "daysSinceRain": {
+          "mean": 8.68521897810219,
+          "standardDeviation": 13.861159847729613
+        }
+      }
+    },
+    {
+      "latitude": 42.798889556164724,
+      "longitude": 2.489674671888293,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 19.042883211678827,
+          "standardDeviation": 7.601350754499476
+        },
+        "humidity": {
+          "mean": 69.84215328467154,
+          "standardDeviation": 13.333581326253011
+        },
+        "maxWind": {
+          "mean": 22.883485401459826,
+          "standardDeviation": 9.393317194951381
+        },
+        "daysSinceRain": {
+          "mean": 3.7931985294117645,
+          "standardDeviation": 4.717036323919303
+        }
+      }
+    },
+    {
+      "latitude": 39.3429627801892,
+      "longitude": -8.068679895146838,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 23.271715328467188,
+          "standardDeviation": 7.539101428042984
+        },
+        "humidity": {
+          "mean": 70.51094890510949,
+          "standardDeviation": 15.235375559619277
+        },
+        "maxWind": {
+          "mean": 19.406934306569315,
+          "standardDeviation": 5.860163927609717
+        },
+        "daysSinceRain": {
+          "mean": 12.748175182481752,
+          "standardDeviation": 21.389516165157453
+        }
+      }
+    },
+    {
+      "latitude": 43.64264032138094,
+      "longitude": -6.427405922730455,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 18.742609489051087,
+          "standardDeviation": 4.3457610163243965
+        },
+        "humidity": {
+          "mean": 78.87317518248175,
+          "standardDeviation": 8.414955152000886
+        },
+        "maxWind": {
+          "mean": 18.332208029197073,
+          "standardDeviation": 7.499981329451784
+        },
+        "daysSinceRain": {
+          "mean": 1.7864963503649636,
+          "standardDeviation": 2.917672077560533
+        }
+      }
+    },
+    {
+      "latitude": 38.13492896127641,
+      "longitude": -3.4640021316897216,
+      "days": 1096,
+      "baseline": {
+        "maxTemperature": {
+          "mean": 24.579105839416066,
+          "standardDeviation": 9.094794348250716
+        },
+        "humidity": {
+          "mean": 58.056569343065696,
+          "standardDeviation": 20.09862754285738
+        },
+        "maxWind": {
+          "mean": 14.589963503649614,
+          "standardDeviation": 5.675022878385682
+        },
+        "daysSinceRain": {
+          "mean": 15.32876712328767,
+          "standardDeviation": 21.55463788751157
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "snapshot": "Per-point climatological baseline for the fire-weather factor W",
+  "built_by": "scripts/build-weather-baseline.mjs",
+  "why": "W = clamp(0.6 + 0.25*sum(z), 0.6, 1.6) has its floor at the mean, so a zero-centred baseline pins it flat onto 0.6. A full annual cycle puts fire season above the yearly mean and lets W vary.",
+  "sources": [
+    {
+      "name": "Open-Meteo ERA5 archive",
+      "url": "https://open-meteo.com/en/docs/historical-weather-api",
+      "license": "CC BY 4.0",
+      "note": "Free, no API key. Deliberately not Visual Crossing: the live series spends that provider's daily record budget."
+    }
+  ],
+  "caveat": "Baseline provider differs from the live series provider (Visual Crossing). ERA5 reanalysis and an observation blend can differ systematically, which biases the z-scores; per-variable means are recorded in the snapshot so this stays auditable.",
+  "variables": [
+    "temperature_2m_max",
+    "relative_humidity_2m_mean",
+    "wind_speed_10m_max",
+    "precipitation_sum"
+  ]
+}

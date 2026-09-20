@@ -9,7 +9,10 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "verify:analytics": "node scripts/verify-grootguard-cells.mjs"
+    "verify:analytics": "node scripts/verify-grootguard-cells.mjs",
+    "verify:weather": "node scripts/verify-weather-model.mjs && node scripts/verify-soil-moisture.mjs",
+    "build:weather-baseline": "node scripts/build-weather-baseline.mjs",
+    "build:weather-fixture": "node scripts/build-weather-fixture.mjs"
   },
   "dependencies": {
     "h3-js": "^4.5.0",
