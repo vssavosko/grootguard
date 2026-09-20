@@ -18,7 +18,7 @@ import cells from "../../public/data/grootguard-cells.json";
 const VISUAL_CROSSING_URL =
   "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline";
 const TIME_ZONE = "Europe/Madrid";
-const REGIONAL_POINT_COUNT = 10;
+const REGIONAL_POINT_COUNT = 24;
 const BASELINE_FILE = "public/data/weather-baseline.json";
 
 /** Timeline span, relative to today in Madrid. */
@@ -31,7 +31,8 @@ const LEAD_IN_DAYS = PAST_DAYS + MOISTURE_WINDOW_DAYS;
 const RAIN_THRESHOLD_MM = 1;
 /**
  * A full refresh costs about 38 provider records per regional point, so a
- * once-daily revalidate keeps ten points inside a 1,000-record daily budget.
+ * once-daily revalidate keeps 24 points (~912 records) inside the 1,000-record
+ * daily budget, with headroom for the per-point estimate being approximate.
  */
 const CACHE_SECONDS = 86_400;
 const RATE_LIMIT_RETRIES = 3;
