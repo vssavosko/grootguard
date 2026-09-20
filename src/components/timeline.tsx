@@ -111,8 +111,8 @@ export function Timeline({
       direction="column"
       gap="2"
       left="4"
-      maxWidth="lg"
-      padding="3"
+      maxWidth="sm"
+      padding="2.5"
       pointerEvents="auto"
       position="absolute"
       right="4"
@@ -158,9 +158,9 @@ export function Timeline({
         <Box>today</Box>
         <Box>{dayLabel(series.dates[series.dates.length - 1])}</Box>
       </Flex>
-      <Box color="slate.300" fontSize="xs">
-        Moving the date recomputes weather W and moisture M only. Vegetation
-        fuel F and consequence C are fixed snapshot values.
+      <Box color="slate.400" fontSize="2xs">
+        Only weather and rainfall change with the date; fuel and consequence are
+        fixed.
       </Box>
     </Flex>
   );

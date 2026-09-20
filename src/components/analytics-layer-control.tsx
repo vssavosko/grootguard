@@ -105,12 +105,12 @@ export function AnalyticsLayerControl({
       gap="2"
       maxHeight="calc(100dvh - 2rem)"
       overflowY="auto"
-      padding="3"
+      padding="2.5"
       pointerEvents="auto"
       position="absolute"
       right="4"
       top="4"
-      width="80"
+      width="72"
       zIndex="1"
     >
       <Box as="strong" fontSize="sm">
@@ -229,7 +229,7 @@ export function AnalyticsLayerControl({
         <>
           <Box color="slate.300" fontSize="xs">
             ESA WorldCover 2021 · land-cover proxy, not measured biomass. Fixed
-            snapshot value — it does not move with the timeline.
+            — does not move with the timeline.
           </Box>
           <Ramp colours="#1d4ed8, #f59e0b, #ef4444">
             Lower → higher vegetation fuel
@@ -239,9 +239,8 @@ export function AnalyticsLayerControl({
       {status === "ready" && activeLayer === "population-assets" && (
         <>
           <Box color="slate.300" fontSize="xs">
-            Colour is Kontur population; a thin outline marks mapped OSM assets.
-            Direct values appear after selection. Observational overview, not a
-            risk score.
+            Kontur population; outline marks mapped OSM assets. Observational,
+            not a risk score.
           </Box>
           <Ramp colours="#0ea5e9, #a3e635, #e11d48">
             Lower → higher population
@@ -251,8 +250,8 @@ export function AnalyticsLayerControl({
       {weatherStatus === "ready" && activeLayer === "priority" && (
         <>
           <Box color="slate.300" fontSize="xs">
-            Prevention priority = F × W × (0.4 + 0.6 × (1 − M)) × C. Model
-            assumption, not an official fire warning or forecast of ignition.
+            F × W × (0.4 + 0.6(1−M)) × C. Model assumption — not an official
+            warning or ignition forecast.
           </Box>
           <Ramp colours="#1d4ed8, #facc15, #fb923c, #f97316">
             Lower → higher priority
@@ -266,9 +265,8 @@ export function AnalyticsLayerControl({
       {weatherStatus === "ready" && activeLayer === "weather" && (
         <>
           <Box color="slate.300" fontSize="xs">
-            Bounded fire-weather factor W (0.6–1.6) from max temperature,
-            humidity, wind and days since rain at 10 regional points; each cell
-            uses its nearest point.
+            Factor W (0.6–1.6) from temperature, humidity, wind and days since
+            rain at 10 regional points.
           </Box>
           <Ramp colours="#1d4ed8, #38bdf8, #facc15, #f97316, #dc2626">
             Milder → harsher fire weather
@@ -290,8 +288,8 @@ export function AnalyticsLayerControl({
       {weatherStatus === "ready" && activeLayer === "moisture" && (
         <>
           <Box color="slate.300" fontSize="xs">
-            Bounded moisture factor M = 30-day precipitation ÷ 60 mm, clamped to
-            0–1. Forecast rain moves it on future dates.
+            Factor M = 30-day rainfall ÷ 60 mm, clamped 0–1. Forecast rain moves
+            it on future dates.
           </Box>
           <Ramp colours="#dc2626, #facc15, #38bdf8, #2563eb">
             Drier → wetter 30-day total
@@ -301,9 +299,8 @@ export function AnalyticsLayerControl({
       {weatherStatus === "ready" && activeLayer === "soil-water" && (
         <>
           <Box color="slate.300" fontSize="xs">
-            Copernicus SWI001 · latest daily satellite observation, with the
-            latest official 10-day composite only where that pass has no data.
-            0.1° / 12.5 km; native no-data remains uncoloured.
+            Copernicus SWI001 · latest daily pass, 10-day composite where it has
+            no data. 0.1° / 12.5 km.
           </Box>
           <Ramp colours="#dc2626, #facc15, #38bdf8, #2563eb">
             Lower → higher soil water

@@ -57,10 +57,11 @@ export function TopZones({ data, dynamic, selectedIndex, onSelect }: Props) {
       </Box>
       {ranked.map((entry, position) => {
         const change = changeLabel(dynamic.rankChange[entry.index]);
-        const place =
-          data.name[entry.index] ??
-          data.province[entry.index] ??
-          "Unnamed cell";
+        // Municipality first, province second: the rank is only actionable if
+        // you can tell which municipality owns the cell.
+        const municipality = data.name[entry.index];
+        const province = data.province[entry.index];
+        const place = municipality ?? province ?? "Unnamed cell";
         return (
           <Flex
             key={data.cells[entry.index]}
@@ -84,9 +85,20 @@ export function TopZones({ data, dynamic, selectedIndex, onSelect }: Props) {
             <Box color={change.tone} width="8">
               {change.text}
             </Box>
-            <Box flex="1" overflow="hidden" textOverflow="ellipsis">
-              {place}
-            </Box>
+            <Flex direction="column" flex="1" overflow="hidden">
+              <Box
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+              >
+                {place}
+              </Box>
+              {municipality && province && (
+                <Box color="slate.500" fontSize="2xs">
+                  {province}
+                </Box>
+              )}
+            </Flex>
             <Box color="slate.300">{entry.value.toFixed(1)}</Box>
             <Box color="slate.500" width="12" textAlign="right">
               {number.format(data.pop[entry.index])}

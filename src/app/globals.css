@@ -3,3 +3,13 @@
 body {
   font-family: var(--font-inter), sans-serif;
 }
+
+/* Floating panels sit at z-index 1 above the map, so fire hover cards need to
+   clear them or they are read through a translucent panel. */
+.mapboxgl-popup {
+  z-index: 2;
+}
+.mapboxgl-popup-content {
+  border-radius: 8px;
+  padding: 8px 10px;
+}

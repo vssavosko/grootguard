@@ -12,7 +12,8 @@
     "verify:analytics": "node scripts/verify-grootguard-cells.mjs",
     "verify:weather": "node scripts/verify-weather-model.mjs && node scripts/verify-soil-moisture.mjs",
     "build:weather-baseline": "node scripts/build-weather-baseline.mjs",
-    "build:weather-fixture": "node scripts/build-weather-fixture.mjs"
+    "build:weather-fixture": "node scripts/build-weather-fixture.mjs",
+    "verify": "node scripts/verify-grootguard-cells.mjs && node scripts/verify-weather-model.mjs && node scripts/verify-soil-moisture.mjs && node scripts/verify-fire-popup.mjs"
   },
   "dependencies": {
     "h3-js": "^4.5.0",
