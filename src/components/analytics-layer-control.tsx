@@ -5,6 +5,7 @@ import {
   type AnalyticsLayerKey,
   fuelIndex,
   type PreparedCells,
+  type WeatherSnapshot,
 } from "@/lib/analytics-layer";
 
 type Props = {
@@ -12,6 +13,8 @@ type Props = {
   data: PreparedCells | null;
   selectedIndex: number | null;
   status: "loading" | "error" | "ready";
+  weatherStatus: "loading" | "error" | "ready";
+  weatherSnapshot: WeatherSnapshot | null;
   onLayerChange: (layer: AnalyticsLayerKey) => void;
 };
 const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
@@ -22,6 +25,8 @@ export function AnalyticsLayerControl({
   data,
   selectedIndex,
   status,
+  weatherStatus,
+  weatherSnapshot,
   onLayerChange,
 }: Props) {
   const selected = data && selectedIndex !== null ? selectedIndex : null;
@@ -70,6 +75,26 @@ export function AnalyticsLayerControl({
         Analytical layers
       </Box>
       <Flex gap="1">
+        {(["weather", "moisture"] as const).map((layer) => (
+          <Box
+            key={layer}
+            as="button"
+            aria-disabled={weatherStatus !== "ready"}
+            aria-pressed={activeLayer === layer}
+            background={activeLayer === layer ? "slate.700" : "slate.800"}
+            borderRadius="md"
+            flex="1"
+            fontSize="xs"
+            padding="2"
+            onClick={() => {
+              if (weatherStatus === "ready") onLayerChange(layer);
+            }}
+          >
+            {layer === "weather" ? "Weather" : "Moisture"}
+          </Box>
+        ))}
+      </Flex>
+      <Flex gap="1">
         <Box
           as="button"
           aria-pressed={activeLayer === "fuel"}
@@ -117,6 +142,17 @@ export function AnalyticsLayerControl({
           Analytical data is unavailable.
         </Box>
       )}
+      {weatherStatus === "loading" && (
+        <Box color="slate.300" fontSize="xs">
+          Loading weather observations…
+        </Box>
+      )}
+      {weatherStatus === "error" && (
+        <Box color="orange.300" fontSize="xs">
+          Weather observations are temporarily unavailable. Static layers still
+          work.
+        </Box>
+      )}
       {status === "ready" && activeLayer === "fuel" && (
         <>
           <Box color="slate.300" fontSize="xs">
@@ -146,6 +182,42 @@ export function AnalyticsLayerControl({
               width="24"
             />
             <Box>Lower → higher population</Box>
+          </Flex>
+        </>
+      )}
+      {weatherStatus === "ready" && activeLayer === "weather" && (
+        <>
+          <Box color="slate.300" fontSize="xs">
+            Observed daily maximum temperature at 10 regional points; each cell
+            uses its nearest point. Colour is °C, not a fire-risk score.
+          </Box>
+          <Flex align="center" fontSize="xs" gap="2">
+            <Box
+              background="linear-gradient(to right, #1d4ed8, #38bdf8, #facc15, #f97316, #dc2626)"
+              height="2"
+              width="24"
+            />
+            <Box>Colder → hotter · observed {weatherSnapshot?.cutoff}</Box>
+          </Flex>
+        </>
+      )}
+      {weatherStatus === "ready" && activeLayer === "moisture" && (
+        <>
+          <Box color="slate.300" fontSize="xs">
+            Copernicus SWI001 · latest daily satellite observation, with the
+            latest official 10-day composite only where that pass has no data.
+            0.1° / 12.5 km; native no-data remains uncoloured.
+          </Box>
+          <Flex align="center" fontSize="xs" gap="2">
+            <Box
+              background="linear-gradient(to right, #dc2626, #facc15, #38bdf8, #2563eb)"
+              height="2"
+              width="24"
+            />
+            <Box>
+              Lower → higher soil water · observed{" "}
+              {weatherSnapshot?.moistureObservedAt}
+            </Box>
           </Flex>
         </>
       )}

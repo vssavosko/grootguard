@@ -1,18 +1,21 @@
 "use client";
 
-import { AnalyticsLayerControl } from "@/components/analytics-layer-control";
-import {
-  addAnalyticsLayer,
-  ANALYTICS_INTERACTIVE_LAYER_IDS,
-  type AnalyticsLayerKey,
-  type CellClips,
-  type PreparedCells,
-  setAnalyticsLayer,
-  setSelectedAnalyticsCell,
-} from "@/lib/analytics-layer";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 import { Box, Flex } from "styled-system/jsx";
+import { AnalyticsLayerControl } from "@/components/analytics-layer-control";
+import {
+  ANALYTICS_INTERACTIVE_LAYER_IDS,
+  type AnalyticsLayerKey,
+  addAnalyticsLayer,
+  type CellClips,
+  createDynamicCells,
+  type PreparedCells,
+  setAnalyticsLayer,
+  setDynamicAnalyticsData,
+  setSelectedAnalyticsCell,
+  type WeatherSnapshot,
+} from "@/lib/analytics-layer";
 
 type Position = [number, number];
 type FireProperties = {
@@ -97,6 +100,11 @@ export function WorldMap() {
   }>({ status: "loading", data: null, clips: null });
   const [activeLayer, setActiveLayer] = useState<AnalyticsLayerKey>("fuel");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [weatherStatus, setWeatherStatus] = useState<
+    "loading" | "error" | "ready"
+  >("loading");
+  const [weatherSnapshot, setWeatherSnapshot] =
+    useState<WeatherSnapshot | null>(null);
 
   useEffect(() => {
     activeLayerRef.current = activeLayer;
@@ -140,6 +148,22 @@ export function WorldMap() {
       .catch(() => {
         if (!cancelled)
           setAnalytics({ status: "error", data: null, clips: null });
+        return null;
+      });
+    const weatherPromise = fetch("/api/weather")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Weather request failed");
+        return (await response.json()) as WeatherSnapshot;
+      })
+      .then((snapshot) => {
+        if (!cancelled) {
+          setWeatherSnapshot(snapshot);
+          setWeatherStatus("ready");
+        }
+        return snapshot;
+      })
+      .catch(() => {
+        if (!cancelled) setWeatherStatus("error");
         return null;
       });
     const setMapData = (perimeters: FireCollection) => {
@@ -209,6 +233,15 @@ export function WorldMap() {
             );
             setAnalyticsLayer(loadedMap, activeLayerRef.current);
             setSelectedAnalyticsCell(loadedMap, selectedRef.current);
+            void weatherPromise.then((weather) => {
+              if (!weather || cancelled) return;
+              setDynamicAnalyticsData(
+                loadedMap,
+                snapshot.data,
+                snapshot.clips,
+                createDynamicCells(snapshot.data, weather),
+              );
+            });
             loadedMap.on("click", ANALYTICS_INTERACTIVE_LAYER_IDS, (event) => {
               const feature = event.features?.[0] as
                 | { properties?: { index?: number } }
@@ -330,6 +363,8 @@ export function WorldMap() {
         data={analytics.data}
         selectedIndex={selectedIndex}
         status={analytics.status}
+        weatherStatus={weatherStatus}
+        weatherSnapshot={weatherSnapshot}
         onLayerChange={setActiveLayer}
       />
     </Box>
